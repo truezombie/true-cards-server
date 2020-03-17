@@ -6,11 +6,11 @@
   "author": "Oleh Ovcharenko",
   "license": "MIT",
   "scripts": {
+    "start:dev": "nodemon",
     "build": "rimraf ./build && tsc",
     "test": "jest --notify --detectOpenHandles --config=jest.config.js",
     "lint": "eslint --ext=.js,.ts src",
     "start": "npm run build && node build/index.js",
-    "start:dev": "nodemon",
     "test:coverage": "jest --coverage"
 
   },
