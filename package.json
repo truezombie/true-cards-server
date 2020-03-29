@@ -40,5 +40,10 @@
     "ts-jest": "^25.2.1",
     "ts-node": "^8.6.2",
     "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "apollo-server-express": "^2.11.0",
+    "cors": "^2.8.5",
+    "mongoose": "^5.9.5"
   }
 }
