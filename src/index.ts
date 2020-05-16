@@ -1,25 +1,53 @@
-const express = require('express');
-const { ApolloServer, gql } = require('apollo-server-express');
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import { ApolloError, ApolloServer } from 'apollo-server-express';
+import config from './utils/config';
+import errorCodes from './utils/error-codes';
 
-// Construct a schema, using GraphQL schema language
-const typeDefs = gql`
-  type Query {
-    hello: String
+import typeDefs from './schemas';
+import resolvers from './resolvers';
+
+import UserAPI from './datasources/user';
+
+import connectToDb from './db/connection';
+
+const getTokenPayload = async (token?: string) => {
+  if (!token) return '';
+
+  try {
+    return await jwt.verify(token, config.jwtSalt);
+  } catch (e) {
+    throw new ApolloError(
+      `Token doesn't valid`,
+      errorCodes.ERROR_TOKEN_IS_NOT_VALID
+    );
   }
-`;
-
-// Provide resolver functions for your schema fields
-const resolvers = {
-  Query: {
-    hello: () => 'Hello world!',
-  },
 };
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const apolloServerStart = store => {
+  const server = new ApolloServer({
+    context: async ({ req }) => {
+      const tokenPayload = await getTokenPayload(req.headers.authorization);
 
-const app = express();
-server.applyMiddleware({ app });
+      return {
+        userId: tokenPayload.id,
+      };
+    },
+    typeDefs,
+    resolvers,
+    dataSources: () => ({
+      userAPI: new UserAPI({ store }),
+    }),
+  });
 
-app.listen({ port: 4000 }, () =>
-  console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
-);
+  const app = express();
+  server.applyMiddleware({ app });
+
+  app.listen(
+    { port: 4000 },
+    () =>
+      console.log(`Server ready at http://localhost:4000${server.graphqlPath}`) // eslint-disable-line no-console
+  );
+};
+
+connectToDb(apolloServerStart);

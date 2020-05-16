@@ -10,6 +10,7 @@
     "build": "rimraf ./build && tsc",
     "test": "jest --notify --detectOpenHandles --config=jest.config.js",
     "lint": "eslint --ext=.js,.ts src",
+    "lint:fix": "eslint --ext=.js,.ts src --fix",
     "start": "npm run build && node build/index.js",
     "test:coverage": "jest --coverage"
   },
@@ -23,6 +24,7 @@
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
     "@types/jest": "^25.1.4",
+    "@types/mongoose": "^5.7.20",
     "@types/node": "^13.9.1",
     "@typescript-eslint/eslint-plugin": "^2.23.0",
     "@typescript-eslint/parser": "^2.24.0",
@@ -42,8 +44,13 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "apollo-datasource": "^0.7.0",
     "apollo-server-express": "^2.11.0",
+    "bcrypt": "^4.0.1",
     "cors": "^2.8.5",
-    "mongoose": "^5.9.5"
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.13"
   }
 }
