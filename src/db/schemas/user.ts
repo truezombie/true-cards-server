@@ -7,7 +7,7 @@ interface InterfaceSchemaUser extends mongoose.Document {
   password: string;
 }
 
-const SchemaUser: mongoose.Schema = new mongoose.Schema({
+const SchemaUser: mongoose.Schema = new mongoose.Schema<InterfaceSchemaUser>({
   firstName: String,
   lastName: String,
   email: String,

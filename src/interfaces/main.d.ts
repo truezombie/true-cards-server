@@ -1,3 +1,0 @@
-interface Context {
-  userId: string;
-}

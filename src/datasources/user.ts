@@ -6,6 +6,7 @@ import { DataSource } from 'apollo-datasource';
 import { InterfaceSchemaUser, SchemaUser } from '../db/schemas';
 import config from '../utils/config';
 import errorCodes from '../utils/error-codes';
+import { Context } from '../types';
 
 class UserAPI extends DataSource {
   store: Mongoose;
@@ -55,25 +56,16 @@ class UserAPI extends DataSource {
 
       return this.generateTokens(user);
     } catch (e) {
-      throw new ApolloError(
-        `Refresh token doesn't valid`,
-        errorCodes.ERROR_TOKEN_IS_NOT_VALID
-      );
+      throw new ApolloError(`Refresh token doesn't valid`, errorCodes.ERROR_TOKEN_IS_NOT_VALID);
     }
   }
 
   async signIn(dataUser) {
     const user = await this.modelUser.findOne({ email: dataUser.email });
-    const isPasswordValid = await bcrypt.compare(
-      dataUser.password,
-      (user && user.password) || ''
-    );
+    const isPasswordValid = await bcrypt.compare(dataUser.password, (user && user.password) || '');
 
     if (!user || !isPasswordValid) {
-      throw new ApolloError(
-        `User doesn't exist`,
-        errorCodes.ERROR_USER_NOT_EXIST
-      );
+      throw new ApolloError(`User doesn't exist`, errorCodes.ERROR_USER_NOT_EXIST);
     }
 
     return this.generateTokens(user);
