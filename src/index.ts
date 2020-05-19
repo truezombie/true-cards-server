@@ -21,7 +21,7 @@ const getTokenPayload = async (token?: string) => {
   }
 };
 
-const apolloServerStart = store => {
+const apolloServerStart = (store) => {
   const server = new ApolloServer({
     context: async ({ req }) => {
       const tokenPayload = await getTokenPayload(req.headers.authorization);

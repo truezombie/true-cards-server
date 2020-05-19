@@ -63,21 +63,17 @@ class CardSetAPI extends DataSource {
       await cardSet.save();
     }
 
-    const allCardSets = await this.modelCardSet.find({
-      userId: this.context.userId,
-    });
+    const cardSets = await this.getCardSets();
 
-    return allCardSets;
+    return cardSets;
   }
 
   async deleteCardSet(cardSetId: string) {
     await this.modelCardSet.deleteOne({ _id: cardSetId });
 
-    const allCardSets = await this.modelCardSet.find({
-      userId: this.context.userId,
-    });
+    const cardSets = await this.getCardSets();
 
-    return allCardSets;
+    return cardSets;
   }
 
   async createCard(data: InterfaceCard, cardSetId: string) {
@@ -103,21 +99,17 @@ class CardSetAPI extends DataSource {
 
     await this.modelCardSet.updateOne({ _id: cardSetId }, { $push: { cards: { ...predefinedCard, ...data } } });
 
-    const cardSet = await this.modelCardSet.findOne({
-      _id: cardSetId,
-    });
+    const cards = await this.getCards(cardSetId);
 
-    return cardSet.cards;
+    return cards;
   }
 
   async deleteCard(cardUuid: string, cardSetId: string) {
     await this.modelCardSet.updateOne({ _id: cardSetId }, { $pull: { cards: { uuid: cardUuid } } });
 
-    const cardSet = await this.modelCardSet.findOne({
-      _id: cardSetId,
-    });
+    const cards = await this.getCards(cardSetId);
 
-    return cardSet.cards;
+    return cards;
   }
 }
 

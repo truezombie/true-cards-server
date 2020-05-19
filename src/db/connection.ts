@@ -4,7 +4,7 @@ import config from '../utils/config';
 
 const dbPath = `mongodb://${config.dbUser}:${config.dbPassword}@${config.dbHost}:${config.dbPort}/${config.dbName}`;
 
-const connectToDb = async cb => {
+const connectToDb = async (cb) => {
   try {
     const db = await mongoose.connect(dbPath, {
       useNewUrlParser: true,

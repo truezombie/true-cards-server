@@ -29,7 +29,7 @@ class UserAPI extends DataSource {
     this.context = conf.context;
   }
 
-  generateTokens = user => {
+  generateTokens = (user) => {
     const authToken = jwt.sign({ id: user._id }, config.jwtSalt, {
       expiresIn: config.jwtAuthTokenTimeLife,
     });
