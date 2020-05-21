@@ -1,42 +1,31 @@
-import mongoose, { Mongoose } from 'mongoose';
+import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import { ApolloError } from 'apollo-server-express';
-import { DataSource } from 'apollo-datasource';
 import { InterfaceSchemaCardSet, InterfaceCard, SchemaCardSet } from '../db/schemas';
 import errorCodes from '../utils/error-codes';
-import { Context } from '../types';
+import BaseDataSourceAPI from './BaseDataSource';
 
-class CardSetAPI extends DataSource {
-  store: Mongoose;
-
-  context: Context;
-
+class CardSetAPI extends BaseDataSourceAPI {
   modelCardSet: mongoose.Model<InterfaceSchemaCardSet>;
 
-  constructor({ store }) {
-    super();
-
-    this.context = { userId: '' };
-
-    this.store = store;
+  constructor(store) {
+    super(store);
 
     this.modelCardSet = this.store.model('CardSet', SchemaCardSet);
   }
 
-  initialize(conf) {
-    this.context = conf.context;
-  }
-
   async getCardSets() {
+    const userId = await this.isExistUser();
     const allCardSets = await this.modelCardSet.find({
-      userId: this.context.userId,
+      userId,
     });
 
     return allCardSets;
   }
 
   async getCards(cardSetId: string) {
+    await this.isExistUser();
     const cardSet = await this.modelCardSet.findOne({
       _id: cardSetId,
     });
@@ -48,6 +37,7 @@ class CardSetAPI extends DataSource {
     // TODO: need to validate name field
     // TODO: need to return some cardSets not all
 
+    const userId = await this.isExistUser();
     const existCardSet = await this.modelCardSet.findOne({ name: data.name });
     const NewCardSet = this.modelCardSet;
 
@@ -55,7 +45,7 @@ class CardSetAPI extends DataSource {
       throw new ApolloError('Card set exist', errorCodes.ERROR_CARD_SET_EXIST);
     } else {
       const cardSet = new NewCardSet({
-        userId: this.context.userId,
+        userId,
         name: data.name,
         cards: [],
       });
@@ -69,6 +59,7 @@ class CardSetAPI extends DataSource {
   }
 
   async deleteCardSet(cardSetId: string) {
+    await this.isExistUser();
     await this.modelCardSet.deleteOne({ _id: cardSetId });
 
     const cardSets = await this.getCardSets();
@@ -77,6 +68,7 @@ class CardSetAPI extends DataSource {
   }
 
   async createCard(data: InterfaceCard, cardSetId: string) {
+    await this.isExistUser();
     // TODO: need to validate front field
     // TODO: need to validate back field
     // TODO: need to validate frontDescription field
@@ -105,6 +97,7 @@ class CardSetAPI extends DataSource {
   }
 
   async deleteCard(cardUuid: string, cardSetId: string) {
+    await this.isExistUser();
     await this.modelCardSet.updateOne({ _id: cardSetId }, { $pull: { cards: { uuid: cardUuid } } });
 
     const cards = await this.getCards(cardSetId);

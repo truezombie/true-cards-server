@@ -1,8 +1,5 @@
 const resolversUser = {
   query: {
-    hello: (_, __, { dataSources }) => {
-      return dataSources.userAPI.getHello();
-    },
     me: async (_, __, { dataSources }) => {
       const me = await dataSources.userAPI.me();
 

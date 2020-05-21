@@ -2,7 +2,6 @@ import { gql } from 'apollo-server-express';
 
 const typeDefs = gql`
   type Query {
-    hello: String
     me: User
     cardSets: [CardSet]
     cards(cardSetId: String!): [Card]

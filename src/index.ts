@@ -1,8 +1,5 @@
 import express from 'express';
-import jwt from 'jsonwebtoken';
-import { ApolloError, ApolloServer } from 'apollo-server-express';
-import config from './utils/config';
-import errorCodes from './utils/error-codes';
+import { ApolloServer } from 'apollo-server-express';
 
 import typeDefs from './schemas';
 import resolvers from './resolvers';
@@ -11,30 +8,18 @@ import { UserAPI, CardSetAPI } from './datasources';
 
 import connectToDb from './db/connection';
 
-const getTokenPayload = async (token?: string) => {
-  if (!token) return '';
-
-  try {
-    return await jwt.verify(token, config.jwtSalt);
-  } catch (e) {
-    throw new ApolloError(`Token doesn't valid`, errorCodes.ERROR_TOKEN_IS_NOT_VALID);
-  }
-};
-
 const apolloServerStart = (store) => {
   const server = new ApolloServer({
     context: async ({ req }) => {
-      const tokenPayload = await getTokenPayload(req.headers.authorization);
-
       return {
-        userId: tokenPayload.id,
+        token: req.headers?.authorization,
       };
     },
     typeDefs,
     resolvers,
     dataSources: () => ({
-      userAPI: new UserAPI({ store }),
-      cardSetAPI: new CardSetAPI({ store }),
+      userAPI: new UserAPI(store),
+      cardSetAPI: new CardSetAPI(store),
     }),
   });
 

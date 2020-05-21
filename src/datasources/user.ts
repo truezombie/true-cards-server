@@ -1,32 +1,19 @@
-import mongoose, { Mongoose } from 'mongoose';
+import mongoose from 'mongoose';
 import { ApolloError } from 'apollo-server-express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { DataSource } from 'apollo-datasource';
 import { InterfaceSchemaUser, SchemaUser } from '../db/schemas';
 import config from '../utils/config';
 import errorCodes from '../utils/error-codes';
-import { Context } from '../types';
+import BaseDataSourceAPI from './BaseDataSource';
 
-class UserAPI extends DataSource {
-  store: Mongoose;
-
-  context: Context;
-
+class UserAPI extends BaseDataSourceAPI {
   modelUser: mongoose.Model<InterfaceSchemaUser>;
 
-  constructor({ store }) {
-    super();
-
-    this.context = { userId: '' };
-
-    this.store = store;
+  constructor(store) {
+    super(store);
 
     this.modelUser = this.store.model('User', SchemaUser);
-  }
-
-  initialize(conf) {
-    this.context = conf.context;
   }
 
   generateTokens = (user) => {
@@ -43,10 +30,6 @@ class UserAPI extends DataSource {
       refreshToken,
     };
   };
-
-  getHello() {
-    return this.context.userId;
-  }
 
   async regenerateTokens(data) {
     try {
@@ -87,7 +70,8 @@ class UserAPI extends DataSource {
   }
 
   async me() {
-    const user = await this.modelUser.findOne({ _id: this.context.userId });
+    const userId = await this.isExistUser();
+    const user = await this.modelUser.findOne({ _id: userId });
 
     return user;
   }
