@@ -39,7 +39,7 @@ class UserAPI extends BaseDataSourceAPI {
 
       return this.generateTokens(user);
     } catch (e) {
-      throw new ApolloError(`Refresh token doesn't valid`, errorCodes.ERROR_TOKEN_IS_NOT_VALID);
+      throw new ApolloError(`Refresh token doesn't valid`, errorCodes.ERROR_TOKEN_REFRESH_IS_NOT_VALID);
     }
   }
 

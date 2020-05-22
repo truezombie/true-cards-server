@@ -38,7 +38,7 @@ class CardSetAPI extends BaseDataSourceAPI {
     // TODO: need to return some cardSets not all
 
     const userId = await this.isExistUser();
-    const existCardSet = await this.modelCardSet.findOne({ name: data.name });
+    const existCardSet = await this.modelCardSet.findOne({ name: data.name, userId });
     const NewCardSet = this.modelCardSet;
 
     if (existCardSet) {

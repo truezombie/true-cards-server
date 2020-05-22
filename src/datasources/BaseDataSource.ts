@@ -30,7 +30,7 @@ class BaseDataSourceAPI extends DataSource {
 
       return tokenPayload.id;
     } catch (e) {
-      throw new ApolloError(`Token doesn't valid`, errorCodes.ERROR_TOKEN_IS_NOT_VALID);
+      throw new ApolloError(`Token doesn't valid`, errorCodes.ERROR_TOKEN_AUTH_IS_NOT_VALID);
     }
   }
 }

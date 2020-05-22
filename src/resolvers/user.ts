@@ -22,10 +22,10 @@ const resolversUser = {
     },
     signUp: async (_, { email, password, firstName, lastName }, { dataSources }) => {
       const tokens = await dataSources.userAPI.signUp({
-        firstName,
-        lastName,
         email,
         password,
+        firstName,
+        lastName,
       });
 
       return tokens;

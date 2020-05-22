@@ -24,6 +24,7 @@ const apolloServerStart = (store) => {
   });
 
   const app = express();
+
   server.applyMiddleware({ app });
 
   app.listen(
