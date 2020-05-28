@@ -14,11 +14,12 @@ const typeDefs = gql`
 
     signUp(email: String!, password: String!, firstName: String!, lastName: String!): Tokens
 
-    createCardSet(name: String!): [CardSet]
-    deleteCardSet(cardSetId: String!): [CardSet]
+    createCardSet(name: String!): String
+    updateCardSet(cardSetId: String!, name: String!): String
+    deleteCardSet(cardSetId: String!): String
 
-    createCard(input: CardInput!, cardSetId: String!): [Card]
-    deleteCard(cardUuid: String!, cardSetId: String!): [Card]
+    createCard(input: CardInput!, cardSetId: String!): String
+    deleteCard(cardUuid: String!, cardSetId: String!): String
   }
 
   type Tokens {

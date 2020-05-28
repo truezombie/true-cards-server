@@ -19,6 +19,12 @@ const resolversCardsSet = {
       return cardsSets;
     },
 
+    updateCardSet: async (_, { cardSetId, name }, { dataSources }) => {
+      const cardsSets = await dataSources.cardSetAPI.updateCardSet(cardSetId, name);
+
+      return cardsSets;
+    },
+
     deleteCardSet: async (_, { cardSetId }, { dataSources }) => {
       const cardsSets = await dataSources.cardSetAPI.deleteCardSet(cardSetId);
 

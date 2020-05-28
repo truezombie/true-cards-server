@@ -42,7 +42,7 @@ class CardSetAPI extends BaseDataSourceAPI {
     const NewCardSet = this.modelCardSet;
 
     if (existCardSet) {
-      throw new ApolloError('Card set exist', errorCodes.ERROR_CARD_SET_EXIST);
+      throw new ApolloError(errorCodes.ERROR_CARD_SET_EXIST);
     } else {
       const cardSet = new NewCardSet({
         userId,
@@ -53,18 +53,20 @@ class CardSetAPI extends BaseDataSourceAPI {
       await cardSet.save();
     }
 
-    const cardSets = await this.getCardSets();
+    return 'OK';
+  }
 
-    return cardSets;
+  async updateCardSet(cardSetId: string, name: string) {
+    await this.modelCardSet.findOneAndUpdate({ _id: cardSetId }, { $set: { name } });
+
+    return 'OK';
   }
 
   async deleteCardSet(cardSetId: string) {
     await this.isExistUser();
     await this.modelCardSet.deleteOne({ _id: cardSetId });
 
-    const cardSets = await this.getCardSets();
-
-    return cardSets;
+    return 'OK';
   }
 
   async createCard(data: InterfaceCard, cardSetId: string) {
@@ -91,18 +93,14 @@ class CardSetAPI extends BaseDataSourceAPI {
 
     await this.modelCardSet.updateOne({ _id: cardSetId }, { $push: { cards: { ...predefinedCard, ...data } } });
 
-    const cards = await this.getCards(cardSetId);
-
-    return cards;
+    return 'OK';
   }
 
   async deleteCard(cardUuid: string, cardSetId: string) {
     await this.isExistUser();
     await this.modelCardSet.updateOne({ _id: cardSetId }, { $pull: { cards: { uuid: cardUuid } } });
 
-    const cards = await this.getCards(cardSetId);
-
-    return cards;
+    return 'OK';
   }
 }
 

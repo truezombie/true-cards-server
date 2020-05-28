@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { ApolloError } from 'apollo-server-express';
+import { AuthenticationError } from 'apollo-server-express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { InterfaceSchemaUser, SchemaUser } from '../db/schemas';
@@ -39,7 +39,7 @@ class UserAPI extends BaseDataSourceAPI {
 
       return this.generateTokens(user);
     } catch (e) {
-      throw new ApolloError(`Refresh token doesn't valid`, errorCodes.ERROR_TOKEN_REFRESH_IS_NOT_VALID);
+      throw new AuthenticationError(errorCodes.ERROR_TOKEN_REFRESH_IS_NOT_VALID);
     }
   }
 
@@ -48,7 +48,7 @@ class UserAPI extends BaseDataSourceAPI {
     const isPasswordValid = await bcrypt.compare(dataUser.password, (user && user.password) || '');
 
     if (!user || !isPasswordValid) {
-      throw new ApolloError(`User doesn't exist`, errorCodes.ERROR_USER_NOT_EXIST);
+      throw new AuthenticationError(errorCodes.ERROR_USER_NOT_EXIST);
     }
 
     return this.generateTokens(user);
@@ -61,7 +61,7 @@ class UserAPI extends BaseDataSourceAPI {
     const user = new NewUser({ ...dataUser, password });
 
     if (existUser) {
-      throw new ApolloError('User exist', errorCodes.ERROR_USER_EXIST);
+      throw new AuthenticationError(errorCodes.ERROR_USER_EXIST);
     } else {
       await user.save();
     }

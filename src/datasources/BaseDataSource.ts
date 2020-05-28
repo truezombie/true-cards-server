@@ -1,6 +1,6 @@
 import { DataSource } from 'apollo-datasource';
 import jwt from 'jsonwebtoken';
-import { ApolloError } from 'apollo-server-express';
+import { AuthenticationError } from 'apollo-server-express';
 import { Mongoose } from 'mongoose';
 import { Context } from '../types';
 
@@ -30,7 +30,7 @@ class BaseDataSourceAPI extends DataSource {
 
       return tokenPayload.id;
     } catch (e) {
-      throw new ApolloError(`Token doesn't valid`, errorCodes.ERROR_TOKEN_AUTH_IS_NOT_VALID);
+      throw new AuthenticationError(errorCodes.ERROR_TOKEN_AUTH_IS_NOT_VALID);
     }
   }
 }
