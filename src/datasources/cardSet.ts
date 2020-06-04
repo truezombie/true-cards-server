@@ -24,13 +24,13 @@ class CardSetAPI extends BaseDataSourceAPI {
     return allCardSets;
   }
 
-  async getCards(cardSetId: string) {
+  async getCardSetWithCards(cardSetId: string) {
     await this.isExistUser();
     const cardSet = await this.modelCardSet.findOne({
       _id: cardSetId,
     });
 
-    return cardSet.cards;
+    return cardSet;
   }
 
   async createCardSet(data: InterfaceSchemaCardSet) {
@@ -69,7 +69,7 @@ class CardSetAPI extends BaseDataSourceAPI {
     return 'OK';
   }
 
-  async createCard(data: InterfaceCard, cardSetId: string) {
+  async createCard(input: InterfaceCard, cardSetId: string) {
     await this.isExistUser();
     // TODO: need to validate front field
     // TODO: need to validate back field
@@ -91,7 +91,24 @@ class CardSetAPI extends BaseDataSourceAPI {
       timesSuccess: 0,
     };
 
-    await this.modelCardSet.updateOne({ _id: cardSetId }, { $push: { cards: { ...predefinedCard, ...data } } });
+    await this.modelCardSet.updateOne({ _id: cardSetId }, { $push: { cards: { ...predefinedCard, ...input } } });
+
+    return 'OK';
+  }
+
+  async updateCard(input: InterfaceCard, cardSetId: string, uuid: string) {
+    await this.modelCardSet.findOneAndUpdate(
+      { _id: cardSetId, cards: { $elemMatch: { uuid } } },
+      {
+        $set: {
+          'cards.$.front': input.front,
+          'cards.$.frontDescription': input.frontDescription,
+          'cards.$.back': input.back,
+          'cards.$.backDescription': input.backDescription,
+          'cards.$.hasBackSide': input.hasBackSide,
+        },
+      }
+    );
 
     return 'OK';
   }

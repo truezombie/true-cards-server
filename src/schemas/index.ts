@@ -4,7 +4,7 @@ const typeDefs = gql`
   type Query {
     me: User
     cardSets: [CardSet]
-    cards(cardSetId: String!): [Card]
+    cardSetWithCards(cardSetId: String!): CardSet
   }
 
   type Mutation {
@@ -18,7 +18,8 @@ const typeDefs = gql`
     updateCardSet(cardSetId: String!, name: String!): String
     deleteCardSet(cardSetId: String!): String
 
-    createCard(input: CardInput!, cardSetId: String!): String
+    createCard(input: CardCreateInput!, cardSetId: String!): String
+    updateCard(input: CardUpdateInput!, cardSetId: String!, uuid: String!): String
     deleteCard(cardUuid: String!, cardSetId: String!): String
   }
 
@@ -34,7 +35,15 @@ const typeDefs = gql`
     lastName: String!
   }
 
-  input CardInput {
+  input CardUpdateInput {
+    front: String!
+    frontDescription: String
+    back: String
+    backDescription: String
+    hasBackSide: Boolean
+  }
+
+  input CardCreateInput {
     front: String!
     frontDescription: String
     back: String

@@ -1,46 +1,52 @@
 const resolversCardsSet = {
   query: {
     cardSets: async (_, __, { dataSources }) => {
-      const cardsSets = await dataSources.cardSetAPI.getCardSets();
+      const response = await dataSources.cardSetAPI.getCardSets();
 
-      return cardsSets;
+      return response;
     },
 
-    cards: async (_, { cardSetId }, { dataSources }) => {
-      const cardsSets = await dataSources.cardSetAPI.getCards(cardSetId);
+    cardSetWithCards: async (_, { cardSetId }, { dataSources }) => {
+      const response = await dataSources.cardSetAPI.getCardSetWithCards(cardSetId);
 
-      return cardsSets;
+      return response;
     },
   },
   mutation: {
     createCardSet: async (_, { name }, { dataSources }) => {
-      const cardsSets = await dataSources.cardSetAPI.createCardSet({ name });
+      const response = await dataSources.cardSetAPI.createCardSet({ name });
 
-      return cardsSets;
+      return response;
     },
 
     updateCardSet: async (_, { cardSetId, name }, { dataSources }) => {
-      const cardsSets = await dataSources.cardSetAPI.updateCardSet(cardSetId, name);
+      const response = await dataSources.cardSetAPI.updateCardSet(cardSetId, name);
 
-      return cardsSets;
+      return response;
     },
 
     deleteCardSet: async (_, { cardSetId }, { dataSources }) => {
-      const cardsSets = await dataSources.cardSetAPI.deleteCardSet(cardSetId);
+      const response = await dataSources.cardSetAPI.deleteCardSet(cardSetId);
 
-      return cardsSets;
+      return response;
     },
 
     createCard: async (_, { input, cardSetId }, { dataSources }) => {
-      const cards = await dataSources.cardSetAPI.createCard(input, cardSetId);
+      const response = await dataSources.cardSetAPI.createCard(input, cardSetId);
 
-      return cards;
+      return response;
+    },
+
+    updateCard: async (_, { input, cardSetId, uuid }, { dataSources }) => {
+      const response = await dataSources.cardSetAPI.updateCard(input, cardSetId, uuid);
+
+      return response;
     },
 
     deleteCard: async (_, { cardUuid, cardSetId }, { dataSources }) => {
-      const cards = await dataSources.cardSetAPI.deleteCard(cardUuid, cardSetId);
+      const response = await dataSources.cardSetAPI.deleteCard(cardUuid, cardSetId);
 
-      return cards;
+      return response;
     },
   },
 };

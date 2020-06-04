@@ -26,7 +26,7 @@ const SchemaCardSet: mongoose.Schema = new mongoose.Schema<InterfaceSchemaCardSe
   cards: [
     {
       uuid: String,
-      front: String,
+      front: { type: String, required: true },
       frontDescription: String,
       back: String,
       backDescription: String,
