@@ -47,6 +47,11 @@ class CardSetAPI extends BaseDataSourceAPI {
       const cardSet = new NewCardSet({
         userId,
         name: data.name,
+        cardsMax: 50,
+        cardsAll: 2,
+        cardsLearned: 12,
+        cardsForgotten: 33,
+        cardsNew: 12,
         cards: [],
       });
 
@@ -75,7 +80,7 @@ class CardSetAPI extends BaseDataSourceAPI {
     // TODO: need to validate back field
     // TODO: need to validate frontDescription field
     // TODO: need to validate backDescription field
-    // TODO: max cards for 1 set 200
+    // TODO: max cards for 1 set 50
 
     const predefinedCard: InterfaceCard = {
       uuid: uuidv4(),

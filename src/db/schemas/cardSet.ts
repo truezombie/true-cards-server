@@ -17,12 +17,22 @@ interface InterfaceCard {
 interface InterfaceSchemaCardSet extends Document {
   userId?: string;
   name: string;
+  cardsMax: number;
+  cardsAll: number;
+  cardsLearned: number;
+  cardsForgotten: number;
+  cardsNew: number;
   cards: [InterfaceCard] | [];
 }
 
 const SchemaCardSet: mongoose.Schema = new mongoose.Schema<InterfaceSchemaCardSet>({
   userId: mongoose.Types.ObjectId,
   name: String,
+  cardsMax: Number,
+  cardsAll: Number,
+  cardsLearned: Number,
+  cardsForgotten: Number,
+  cardsNew: Number,
   cards: [
     {
       uuid: String,
