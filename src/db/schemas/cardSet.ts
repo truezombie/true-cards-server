@@ -9,8 +9,6 @@ interface InterfaceCard {
   hasBackSide?: boolean;
   timeAdded?: number;
   timeLastSuccess?: number;
-  timeLastFailed?: number;
-  timesFailed?: number;
   timesSuccess?: number;
 }
 
@@ -18,10 +16,6 @@ interface InterfaceSchemaCardSet extends Document {
   userId?: string;
   name: string;
   cardsMax: number;
-  cardsAll: number;
-  cardsLearned: number;
-  cardsForgotten: number;
-  cardsNew: number;
   cards: [InterfaceCard] | [];
 }
 
@@ -29,10 +23,6 @@ const SchemaCardSet: mongoose.Schema = new mongoose.Schema<InterfaceSchemaCardSe
   userId: mongoose.Types.ObjectId,
   name: String,
   cardsMax: Number,
-  cardsAll: Number,
-  cardsLearned: Number,
-  cardsForgotten: Number,
-  cardsNew: Number,
   cards: [
     {
       uuid: String,
@@ -43,11 +33,11 @@ const SchemaCardSet: mongoose.Schema = new mongoose.Schema<InterfaceSchemaCardSe
       hasBackSide: Boolean,
       timeAdded: Number,
       timeLastSuccess: Number,
-      timeLastFailed: Number,
-      timesFailed: Number,
       timesSuccess: Number,
     },
   ],
 });
 
-export { SchemaCardSet, InterfaceSchemaCardSet, InterfaceCard };
+const ModelSchemaCardSet = mongoose.model<InterfaceSchemaCardSet>('CardSet', SchemaCardSet);
+
+export { SchemaCardSet, ModelSchemaCardSet, InterfaceSchemaCardSet, InterfaceCard };

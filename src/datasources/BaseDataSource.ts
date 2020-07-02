@@ -2,23 +2,15 @@ import { DataSource } from 'apollo-datasource';
 import jwt from 'jsonwebtoken';
 import { AuthenticationError } from 'apollo-server-express';
 import { Mongoose } from 'mongoose';
-import { Context } from '../types';
 
 import config from '../utils/config';
 import errorCodes from '../utils/error-codes';
 
 class BaseDataSourceAPI extends DataSource {
-  store: Mongoose;
-
-  context: Context;
-
-  constructor(store) {
-    super();
-
-    this.context = { token: '' };
-
-    this.store = store;
-  }
+  public context: {
+    token: string;
+    mongoClient: Mongoose;
+  };
 
   initialize(conf) {
     this.context = conf.context;

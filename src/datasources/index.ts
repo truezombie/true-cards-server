@@ -1,4 +1,5 @@
-import UserAPI from './user';
-import CardSetAPI from './cardSet';
+import UserAPI from './User';
+import CardSetAPI from './CardSet';
+import LearningAPI from './Learning';
 
-export { UserAPI, CardSetAPI };
+export { UserAPI, CardSetAPI, LearningAPI };

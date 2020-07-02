@@ -5,7 +5,6 @@ const typeDefs = gql`
     me: User
     cardSets: [CardSet]
     cardSetWithCards(cardSetId: String!): CardSet
-    cardSetInfo(cardSetId: String!): CardSetInfo
   }
 
   type Mutation {
@@ -22,12 +21,6 @@ const typeDefs = gql`
     createCard(input: CardCreateInput!, cardSetId: String!): String
     updateCard(input: CardUpdateInput!, cardSetId: String!, uuid: String!): String
     deleteCard(cardUuid: String!, cardSetId: String!): String
-  }
-
-  type CardSetInfo {
-    learned: Int!
-    forgotten: Int!
-    new: Int!
   }
 
   type Tokens {
@@ -58,8 +51,6 @@ const typeDefs = gql`
     hasBackSide: Boolean
     timeAdded: Float
     timeLastSuccess: Float
-    timeLastFailed: Float
-    timesFailed: Float
     timesSuccess: Float
   }
 
@@ -73,8 +64,6 @@ const typeDefs = gql`
     hasBackSide: Boolean
     timeAdded: Float
     timeLastSuccess: Float
-    timeLastFailed: Float
-    timesFailed: Float
     timesSuccess: Float
   }
 
@@ -84,9 +73,6 @@ const typeDefs = gql`
     name: String!
     cardsMax: Int!
     cardsAll: Int!
-    cardsLearned: Int!
-    cardsForgotten: Int!
-    cardsNew: Int!
     cards: [Card]
   }
 `;

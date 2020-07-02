@@ -1,4 +1,12 @@
-import { SchemaUser, InterfaceSchemaUser } from './user';
-import { SchemaCardSet, InterfaceSchemaCardSet, InterfaceCard } from './cardSet';
+import { SchemaUser, ModelUser, InterfaceSchemaUser } from './user';
+import { SchemaCardSet, ModelSchemaCardSet, InterfaceSchemaCardSet, InterfaceCard } from './cardSet';
 
-export { SchemaUser, InterfaceSchemaUser, SchemaCardSet, InterfaceSchemaCardSet, InterfaceCard };
+export {
+  SchemaUser,
+  ModelUser,
+  InterfaceSchemaUser,
+  SchemaCardSet,
+  ModelSchemaCardSet,
+  InterfaceSchemaCardSet,
+  InterfaceCard,
+};

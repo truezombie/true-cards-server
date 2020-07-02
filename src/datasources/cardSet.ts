@@ -1,32 +1,35 @@
-import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
-import moment from 'moment';
 import { ApolloError } from 'apollo-server-express';
-import { InterfaceSchemaCardSet, InterfaceCard, SchemaCardSet } from '../db/schemas';
+import moment from 'moment';
+
+import { InterfaceSchemaCardSet, InterfaceCard, ModelSchemaCardSet } from '../db/schemas';
 import errorCodes from '../utils/error-codes';
 import BaseDataSourceAPI from './BaseDataSource';
 
+import { DEFAULT_MAX_CARDS_IN_CARD_SET } from '../constants/app';
+
 class CardSetAPI extends BaseDataSourceAPI {
-  modelCardSet: mongoose.Model<InterfaceSchemaCardSet>;
-
-  constructor(store) {
-    super(store);
-
-    this.modelCardSet = this.store.model('CardSet', SchemaCardSet);
-  }
-
   async getCardSets() {
     const userId = await this.isExistUser();
-    const allCardSets = await this.modelCardSet.find({
+    const allCardSets = await ModelSchemaCardSet.find({
       userId,
     });
 
-    return allCardSets;
+    return allCardSets.map((item) => {
+      return {
+        id: item._id,
+        userId: item.userId,
+        name: item.name,
+        cardsMax: item.cardsMax,
+        cardsAll: item.cards.length,
+        cards: item.cards,
+      };
+    });
   }
 
   async getCardSetWithCards(cardSetId: string) {
     await this.isExistUser();
-    const cardSet = await this.modelCardSet.findOne({
+    const cardSet = await ModelSchemaCardSet.findOne({
       _id: cardSetId,
     });
 
@@ -38,8 +41,8 @@ class CardSetAPI extends BaseDataSourceAPI {
     // TODO: need to return some cardSets not all
 
     const userId = await this.isExistUser();
-    const existCardSet = await this.modelCardSet.findOne({ name: data.name, userId });
-    const NewCardSet = this.modelCardSet;
+    const existCardSet = await ModelSchemaCardSet.findOne({ name: data.name, userId });
+    const NewCardSet = ModelSchemaCardSet;
 
     if (existCardSet) {
       throw new ApolloError(errorCodes.ERROR_CARD_SET_EXIST);
@@ -47,11 +50,7 @@ class CardSetAPI extends BaseDataSourceAPI {
       const cardSet = new NewCardSet({
         userId,
         name: data.name,
-        cardsMax: 50,
-        cardsAll: 2,
-        cardsLearned: 12,
-        cardsForgotten: 33,
-        cardsNew: 12,
+        cardsMax: DEFAULT_MAX_CARDS_IN_CARD_SET,
         cards: [],
       });
 
@@ -62,14 +61,15 @@ class CardSetAPI extends BaseDataSourceAPI {
   }
 
   async updateCardSet(cardSetId: string, name: string) {
-    await this.modelCardSet.findOneAndUpdate({ _id: cardSetId }, { $set: { name } });
+    await this.isExistUser();
+    await ModelSchemaCardSet.findOneAndUpdate({ _id: cardSetId }, { $set: { name } });
 
     return 'OK';
   }
 
   async deleteCardSet(cardSetId: string) {
     await this.isExistUser();
-    await this.modelCardSet.deleteOne({ _id: cardSetId });
+    await ModelSchemaCardSet.deleteOne({ _id: cardSetId });
 
     return 'OK';
   }
@@ -91,18 +91,17 @@ class CardSetAPI extends BaseDataSourceAPI {
       hasBackSide: false,
       timeAdded: moment().valueOf(),
       timeLastSuccess: 0,
-      timeLastFailed: 0,
-      timesFailed: 0,
       timesSuccess: 0,
     };
 
-    await this.modelCardSet.updateOne({ _id: cardSetId }, { $push: { cards: { ...predefinedCard, ...input } } });
+    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { $push: { cards: { ...predefinedCard, ...input } } });
 
     return 'OK';
   }
 
   async updateCard(input: InterfaceCard, cardSetId: string, uuid: string) {
-    await this.modelCardSet.findOneAndUpdate(
+    await this.isExistUser();
+    await ModelSchemaCardSet.findOneAndUpdate(
       { _id: cardSetId, cards: { $elemMatch: { uuid } } },
       {
         $set: {
@@ -120,7 +119,7 @@ class CardSetAPI extends BaseDataSourceAPI {
 
   async deleteCard(cardUuid: string, cardSetId: string) {
     await this.isExistUser();
-    await this.modelCardSet.updateOne({ _id: cardSetId }, { $pull: { cards: { uuid: cardUuid } } });
+    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { $pull: { cards: { uuid: cardUuid } } });
 
     return 'OK';
   }

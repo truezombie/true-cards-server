@@ -4,22 +4,27 @@ import { ApolloServer } from 'apollo-server-express';
 import typeDefs from './schemas';
 import resolvers from './resolvers';
 
-import { UserAPI, CardSetAPI } from './datasources';
+import { UserAPI, CardSetAPI, LearningAPI } from './datasources';
 
-import connectToDb from './db/connection';
+import { connectToMongoDb, connectToRedis } from './db/connection';
 
-const apolloServerStart = (store) => {
+const apolloServerStart = (mongoClient) => {
+  const redisClient = connectToRedis();
+
   const server = new ApolloServer({
     context: async ({ req }) => {
       return {
         token: req.headers?.authorization,
+        mongoClient,
+        redisClient,
       };
     },
     typeDefs,
     resolvers,
     dataSources: () => ({
-      userAPI: new UserAPI(store),
-      cardSetAPI: new CardSetAPI(store),
+      userAPI: new UserAPI(),
+      cardSetAPI: new CardSetAPI(),
+      learningAPI: new LearningAPI(),
     }),
   });
 
@@ -33,4 +38,4 @@ const apolloServerStart = (store) => {
   );
 };
 
-connectToDb(apolloServerStart);
+connectToMongoDb(apolloServerStart);

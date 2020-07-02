@@ -1,6 +1,7 @@
 const resolversCardsSet = {
   query: {
-    cardSets: async (_, __, { dataSources }) => {
+    cardSets: async (_, { redisClient }, { dataSources }) => {
+      console.log(redisClient);
       const response = await dataSources.cardSetAPI.getCardSets();
 
       return response;

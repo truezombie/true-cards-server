@@ -14,4 +14,6 @@ const SchemaUser: mongoose.Schema = new mongoose.Schema<InterfaceSchemaUser>({
   password: String,
 });
 
-export { SchemaUser, InterfaceSchemaUser };
+const ModelUser = mongoose.model<InterfaceSchemaUser>('User', SchemaUser);
+
+export { SchemaUser, ModelUser, InterfaceSchemaUser };
