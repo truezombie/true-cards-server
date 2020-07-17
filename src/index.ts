@@ -6,17 +6,14 @@ import resolvers from './resolvers';
 
 import { UserAPI, CardSetAPI, LearningAPI } from './datasources';
 
-import { connectToMongoDb, connectToRedis } from './db/connection';
+import connectToMongoDb from './db/connection';
 
 const apolloServerStart = (mongoClient) => {
-  const redisClient = connectToRedis();
-
   const server = new ApolloServer({
     context: async ({ req }) => {
       return {
         token: req.headers?.authorization,
         mongoClient,
-        redisClient,
       };
     },
     typeDefs,

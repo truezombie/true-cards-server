@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import redis from 'redis';
 
 import config from '../utils/config';
 
@@ -20,18 +19,4 @@ const connectToMongoDb = async (cb) => {
   }
 };
 
-const connectToRedis = () => {
-  const redisClient = redis.createClient();
-
-  redisClient.on('connect', () => {
-    console.log(`Redis has been connected`);
-  });
-
-  redisClient.on('error', (err) => {
-    throw new Error(`Redis: connection failed ${err}`);
-  });
-
-  return redisClient;
-};
-
-export { connectToMongoDb, connectToRedis };
+export default connectToMongoDb;

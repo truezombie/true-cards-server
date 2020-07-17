@@ -21,6 +21,11 @@ const typeDefs = gql`
     createCard(input: CardCreateInput!, cardSetId: String!): String
     updateCard(input: CardUpdateInput!, cardSetId: String!, uuid: String!): String
     deleteCard(cardUuid: String!, cardSetId: String!): String
+
+    startSessionNewAndForgot(numberOfCards: Int!, cardSetId: String!): String
+    startSessionNew(numberOfCards: Int!, cardSetId: String!): String
+    startSessionForgot(numberOfCards: Int!, cardSetId: String!): String
+    startSessionLearned(numberOfCards: Int!, cardSetId: String!): String
   }
 
   type Tokens {

@@ -1,7 +1,6 @@
 const resolversCardsSet = {
   query: {
-    cardSets: async (_, { redisClient }, { dataSources }) => {
-      console.log(redisClient);
+    cardSets: async (_, __, { dataSources }) => {
       const response = await dataSources.cardSetAPI.getCardSets();
 
       return response;
@@ -46,6 +45,30 @@ const resolversCardsSet = {
 
     deleteCard: async (_, { cardUuid, cardSetId }, { dataSources }) => {
       const response = await dataSources.cardSetAPI.deleteCard(cardUuid, cardSetId);
+
+      return response;
+    },
+
+    startSessionNewAndForgot: async (_, { numberOfCards, cardSetId }, { dataSources }) => {
+      const response = await dataSources.learningAPI.learnNewAndForgot(numberOfCards, cardSetId);
+
+      return response;
+    },
+
+    startSessionNew: async (_, { numberOfCards, cardSetId }, { dataSources }) => {
+      const response = await dataSources.learningAPI.learnNew(numberOfCards, cardSetId);
+
+      return response;
+    },
+
+    startSessionForgot: async (_, { numberOfCards, cardSetId }, { dataSources }) => {
+      const response = await dataSources.learningAPI.learnForgot(numberOfCards, cardSetId);
+
+      return response;
+    },
+
+    startSessionLearned: async (_, { numberOfCards, cardSetId }, { dataSources }) => {
+      const response = await dataSources.learningAPI.learnLearned(numberOfCards, cardSetId);
 
       return response;
     },

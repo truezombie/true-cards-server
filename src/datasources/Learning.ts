@@ -1,13 +1,10 @@
-import mongoose from 'mongoose';
 import moment from 'moment';
 
-import { InterfaceSchemaCardSet } from '../db/schemas';
+import { ModelSchemaCardSet } from '../db/schemas';
 import BaseDataSourceAPI from './BaseDataSource';
 
 class LearningAPI extends BaseDataSourceAPI {
   private SEED_OF_OBLIVION = 1;
-
-  modelCardSet: mongoose.Model<InterfaceSchemaCardSet>;
 
   isCardLearned = (card): boolean => {
     return moment(new Date()).isBefore(
@@ -25,7 +22,7 @@ class LearningAPI extends BaseDataSourceAPI {
 
   async getCards(cardSetId: string) {
     const user = await this.isExistUser();
-    const { cards = [] } = await this.modelCardSet.findOne({
+    const { cards = [] } = await ModelSchemaCardSet.findOne({
       _id: cardSetId,
     });
 
@@ -35,55 +32,73 @@ class LearningAPI extends BaseDataSourceAPI {
     };
   }
 
-  // async learnNewAndForgot(redisClient, numberOfCards: number, cardSetId: string) {
-  //   // TODO: check that I can create learning session
+  async learnNewAndForgot(numberOfCards: number, cardSetId: string) {
+    // TODO: check that I can create learning session maybe session is exist
+    // TODO: check that cards folder can be empty
+    const { cards } = await this.getCards(cardSetId);
 
-  //   const { cards, user } = await this.getCards(cardSetId);
+    const learningSession = cards
+      .filter((card) => {
+        return this.isForgottenCard(card) || this.isNewCard(card);
+      })
+      .slice(0, numberOfCards)
+      .map((card) => card.uuid);
 
-  //   const filteredCards = cards
-  //     .filter((card) => {
-  //       return this.isForgottenCard(card) || this.isNewCard(card);
-  //     })
-  //     .slice(0, numberOfCards);
-  // }
+    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession });
 
-  // async learnNew(redisClient, numberOfCards: number, cardSetId: string) {
-  //   // TODO: check that I can create learning session
+    return 'OK';
+  }
 
-  //   const { cards, user } = await this.getCards(cardSetId);
+  async learnNew(numberOfCards: number, cardSetId: string) {
+    // TODO: check that I can create learning session maybe session is exist
+    // TODO: check that cards folder can be empty
+    const { cards } = await this.getCards(cardSetId);
 
-  //   const filteredCards = cards
-  //     .filter((card) => {
-  //       return this.isNewCard(card);
-  //     })
-  //     .slice(0, numberOfCards);
-  // }
+    const learningSession = cards
+      .filter((card) => {
+        return this.isNewCard(card);
+      })
+      .slice(0, numberOfCards)
+      .map((card) => card.uuid);
 
-  // async learnForgot(redisClient, numberOfCards: number, cardSetId: string) {
-  //   // TODO: check that I can create learning session
+    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession });
 
-  //   const { cards, user } = await this.getCards(cardSetId);
+    return 'OK';
+  }
 
-  //   const filteredCards = cards
-  //     .filter((card) => {
-  //       return this.isForgottenCard(card);
-  //     })
-  //     .slice(0, numberOfCards);
-  // }
+  async learnForgot(numberOfCards: number, cardSetId: string) {
+    // TODO: check that I can create learning session maybe session is exist
+    // TODO: check that cards folder can be empty
+    const { cards } = await this.getCards(cardSetId);
 
-  // async learnLearned(redisClient, numberOfCards: number, cardSetId: string) {
-  //   // TODO: check that I can create learning session
+    const learningSession = cards
+      .filter((card) => {
+        return this.isForgottenCard(card);
+      })
+      .slice(0, numberOfCards)
+      .map((card) => card.uuid);
 
-  //   const { cards, user } = await this.getCards(cardSetId);
+    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession });
 
-  //   const filteredCards = cards
-  //     .filter((card) => {
-  //       return this.isCardLearned(card);
-  //     })
-  //     .slice(0, numberOfCards);
-  // }
+    return 'OK';
+  }
 
-  // async getActiveSession() {}
+  async learnLearned(numberOfCards: number, cardSetId: string) {
+    // TODO: check that I can create learning session maybe session is exist
+    // TODO: check that cards folder can be empty
+    const { cards } = await this.getCards(cardSetId);
+
+    const learningSession = cards
+      .filter((card) => {
+        return this.isCardLearned(card);
+      })
+      .slice(0, numberOfCards)
+      .map((card) => card.uuid);
+
+    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession });
+
+    return 'OK';
+  }
 }
 
 export default LearningAPI;

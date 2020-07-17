@@ -16,13 +16,15 @@ interface InterfaceSchemaCardSet extends Document {
   userId?: string;
   name: string;
   cardsMax: number;
-  cards: [InterfaceCard] | [];
+  learningSession: string[];
+  cards: [InterfaceCard];
 }
 
 const SchemaCardSet: mongoose.Schema = new mongoose.Schema<InterfaceSchemaCardSet>({
   userId: mongoose.Types.ObjectId,
   name: String,
   cardsMax: Number,
+  learningSession: [String],
   cards: [
     {
       uuid: String,
