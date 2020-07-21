@@ -37,16 +37,21 @@ class LearningAPI extends BaseDataSourceAPI {
     // TODO: check that cards folder can be empty
     const { cards } = await this.getCards(cardSetId);
 
-    const learningSession = cards
+    return cards
       .filter((card) => {
         return this.isForgottenCard(card) || this.isNewCard(card);
       })
       .slice(0, numberOfCards)
-      .map((card) => card.uuid);
-
-    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession });
-
-    return 'OK';
+      .map((card) => {
+        return {
+          uuid: card.uuid,
+          front: card.front,
+          frontDescription: card.frontDescription,
+          back: card.back,
+          backDescription: card.backDescription,
+          hasBackSide: card.hasBackSide,
+        };
+      });
   }
 
   async learnNew(numberOfCards: number, cardSetId: string) {
@@ -54,16 +59,21 @@ class LearningAPI extends BaseDataSourceAPI {
     // TODO: check that cards folder can be empty
     const { cards } = await this.getCards(cardSetId);
 
-    const learningSession = cards
+    return cards
       .filter((card) => {
         return this.isNewCard(card);
       })
       .slice(0, numberOfCards)
-      .map((card) => card.uuid);
-
-    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession });
-
-    return 'OK';
+      .map((card) => {
+        return {
+          uuid: card.uuid,
+          front: card.front,
+          frontDescription: card.frontDescription,
+          back: card.back,
+          backDescription: card.backDescription,
+          hasBackSide: card.hasBackSide,
+        };
+      });
   }
 
   async learnForgot(numberOfCards: number, cardSetId: string) {
@@ -71,16 +81,21 @@ class LearningAPI extends BaseDataSourceAPI {
     // TODO: check that cards folder can be empty
     const { cards } = await this.getCards(cardSetId);
 
-    const learningSession = cards
+    return cards
       .filter((card) => {
         return this.isForgottenCard(card);
       })
       .slice(0, numberOfCards)
-      .map((card) => card.uuid);
-
-    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession });
-
-    return 'OK';
+      .map((card) => {
+        return {
+          uuid: card.uuid,
+          front: card.front,
+          frontDescription: card.frontDescription,
+          back: card.back,
+          backDescription: card.backDescription,
+          hasBackSide: card.hasBackSide,
+        };
+      });
   }
 
   async learnLearned(numberOfCards: number, cardSetId: string) {
@@ -88,16 +103,21 @@ class LearningAPI extends BaseDataSourceAPI {
     // TODO: check that cards folder can be empty
     const { cards } = await this.getCards(cardSetId);
 
-    const learningSession = cards
+    return cards
       .filter((card) => {
         return this.isCardLearned(card);
       })
       .slice(0, numberOfCards)
-      .map((card) => card.uuid);
-
-    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession });
-
-    return 'OK';
+      .map((card) => {
+        return {
+          uuid: card.uuid,
+          front: card.front,
+          frontDescription: card.frontDescription,
+          back: card.back,
+          backDescription: card.backDescription,
+          hasBackSide: card.hasBackSide,
+        };
+      });
   }
 }
 

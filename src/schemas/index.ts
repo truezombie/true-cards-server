@@ -22,10 +22,10 @@ const typeDefs = gql`
     updateCard(input: CardUpdateInput!, cardSetId: String!, uuid: String!): String
     deleteCard(cardUuid: String!, cardSetId: String!): String
 
-    startSessionNewAndForgot(numberOfCards: Int!, cardSetId: String!): String
-    startSessionNew(numberOfCards: Int!, cardSetId: String!): String
-    startSessionForgot(numberOfCards: Int!, cardSetId: String!): String
-    startSessionLearned(numberOfCards: Int!, cardSetId: String!): String
+    startSessionNewAndForgot(numberOfCards: Int!, cardSetId: String!): [WillLearnedCards]
+    startSessionNew(numberOfCards: Int!, cardSetId: String!): [WillLearnedCards]
+    startSessionForgot(numberOfCards: Int!, cardSetId: String!): [WillLearnedCards]
+    startSessionLearned(numberOfCards: Int!, cardSetId: String!): [WillLearnedCards]
   }
 
   type Tokens {
@@ -57,6 +57,15 @@ const typeDefs = gql`
     timeAdded: Float
     timeLastSuccess: Float
     timesSuccess: Float
+  }
+
+  type WillLearnedCards {
+    uuid: ID!
+    front: String
+    frontDescription: String
+    back: String
+    backDescription: String
+    hasBackSide: Boolean
   }
 
   type Card {
