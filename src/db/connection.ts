@@ -15,7 +15,7 @@ const connectToMongoDb = async (cb) => {
 
     cb(db);
   } catch (err) {
-    throw new Error(`Redis: connection failed ${err}`);
+    throw new Error(`MongoDB: connection failed ${err}`);
   }
 };
 

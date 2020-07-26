@@ -49,26 +49,8 @@ const resolversCardsSet = {
       return response;
     },
 
-    startSessionNewAndForgot: async (_, { numberOfCards, cardSetId }, { dataSources }) => {
-      const response = await dataSources.learningAPI.learnNewAndForgot(numberOfCards, cardSetId);
-
-      return response;
-    },
-
-    startSessionNew: async (_, { numberOfCards, cardSetId }, { dataSources }) => {
-      const response = await dataSources.learningAPI.learnNew(numberOfCards, cardSetId);
-
-      return response;
-    },
-
-    startSessionForgot: async (_, { numberOfCards, cardSetId }, { dataSources }) => {
-      const response = await dataSources.learningAPI.learnForgot(numberOfCards, cardSetId);
-
-      return response;
-    },
-
-    startSessionLearned: async (_, { numberOfCards, cardSetId }, { dataSources }) => {
-      const response = await dataSources.learningAPI.learnLearned(numberOfCards, cardSetId);
+    startLearningSession: async (_, { numberOfCards, cardSetId, sessionType }, { dataSources }) => {
+      const response = await dataSources.learningAPI.startLearningSession(numberOfCards, cardSetId, sessionType);
 
       return response;
     },

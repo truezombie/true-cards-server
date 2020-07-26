@@ -22,10 +22,7 @@ const typeDefs = gql`
     updateCard(input: CardUpdateInput!, cardSetId: String!, uuid: String!): String
     deleteCard(cardUuid: String!, cardSetId: String!): String
 
-    startSessionNewAndForgot(numberOfCards: Int!, cardSetId: String!): [WillLearnedCards]
-    startSessionNew(numberOfCards: Int!, cardSetId: String!): [WillLearnedCards]
-    startSessionForgot(numberOfCards: Int!, cardSetId: String!): [WillLearnedCards]
-    startSessionLearned(numberOfCards: Int!, cardSetId: String!): [WillLearnedCards]
+    startLearningSession(numberOfCards: Int!, cardSetId: String!, sessionType: String!): String
   }
 
   type Tokens {

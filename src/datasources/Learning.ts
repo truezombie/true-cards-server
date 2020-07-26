@@ -3,6 +3,13 @@ import moment from 'moment';
 import { ModelSchemaCardSet } from '../db/schemas';
 import BaseDataSourceAPI from './BaseDataSource';
 
+enum LEARNING_SESSION_TYPES {
+  NEW_AND_FORGOT = 'NEW_AND_FORGOT',
+  NEW = 'NEW',
+  FORGOT = 'FORGOT',
+  LEARNED = 'LEARNED',
+}
+
 class LearningAPI extends BaseDataSourceAPI {
   private SEED_OF_OBLIVION = 1;
 
@@ -32,92 +39,32 @@ class LearningAPI extends BaseDataSourceAPI {
     };
   }
 
-  async learnNewAndForgot(numberOfCards: number, cardSetId: string) {
+  async startLearningSession(numberOfCards: number, cardSetId: string, sessionType: LEARNING_SESSION_TYPES) {
     // TODO: check that I can create learning session maybe session is exist
     // TODO: check that cards folder can be empty
     const { cards } = await this.getCards(cardSetId);
 
-    return cards
+    const learningSession = cards
       .filter((card) => {
-        return this.isForgottenCard(card) || this.isNewCard(card);
+        switch (sessionType) {
+          case LEARNING_SESSION_TYPES.NEW_AND_FORGOT:
+            return this.isForgottenCard(card) || this.isNewCard(card);
+          case LEARNING_SESSION_TYPES.NEW:
+            return this.isNewCard(card);
+          case LEARNING_SESSION_TYPES.FORGOT:
+            return this.isForgottenCard(card);
+          case LEARNING_SESSION_TYPES.LEARNED:
+            return this.isCardLearned(card);
+          default:
+            return false;
+        }
       })
       .slice(0, numberOfCards)
-      .map((card) => {
-        return {
-          uuid: card.uuid,
-          front: card.front,
-          frontDescription: card.frontDescription,
-          back: card.back,
-          backDescription: card.backDescription,
-          hasBackSide: card.hasBackSide,
-        };
-      });
-  }
+      .map((card) => card.uuid);
 
-  async learnNew(numberOfCards: number, cardSetId: string) {
-    // TODO: check that I can create learning session maybe session is exist
-    // TODO: check that cards folder can be empty
-    const { cards } = await this.getCards(cardSetId);
+    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession });
 
-    return cards
-      .filter((card) => {
-        return this.isNewCard(card);
-      })
-      .slice(0, numberOfCards)
-      .map((card) => {
-        return {
-          uuid: card.uuid,
-          front: card.front,
-          frontDescription: card.frontDescription,
-          back: card.back,
-          backDescription: card.backDescription,
-          hasBackSide: card.hasBackSide,
-        };
-      });
-  }
-
-  async learnForgot(numberOfCards: number, cardSetId: string) {
-    // TODO: check that I can create learning session maybe session is exist
-    // TODO: check that cards folder can be empty
-    const { cards } = await this.getCards(cardSetId);
-
-    return cards
-      .filter((card) => {
-        return this.isForgottenCard(card);
-      })
-      .slice(0, numberOfCards)
-      .map((card) => {
-        return {
-          uuid: card.uuid,
-          front: card.front,
-          frontDescription: card.frontDescription,
-          back: card.back,
-          backDescription: card.backDescription,
-          hasBackSide: card.hasBackSide,
-        };
-      });
-  }
-
-  async learnLearned(numberOfCards: number, cardSetId: string) {
-    // TODO: check that I can create learning session maybe session is exist
-    // TODO: check that cards folder can be empty
-    const { cards } = await this.getCards(cardSetId);
-
-    return cards
-      .filter((card) => {
-        return this.isCardLearned(card);
-      })
-      .slice(0, numberOfCards)
-      .map((card) => {
-        return {
-          uuid: card.uuid,
-          front: card.front,
-          frontDescription: card.frontDescription,
-          back: card.back,
-          backDescription: card.backDescription,
-          hasBackSide: card.hasBackSide,
-        };
-      });
+    return 'OK';
   }
 }
 
