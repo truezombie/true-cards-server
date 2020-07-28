@@ -11,6 +11,12 @@ const resolversCardsSet = {
 
       return response;
     },
+
+    getCurrentLearningCard: async (_, { cardSetId }, { dataSources }) => {
+      const response = await dataSources.learningAPI.getCurrentLearningCard(cardSetId);
+
+      return response;
+    },
   },
   mutation: {
     createCardSet: async (_, { name }, { dataSources }) => {

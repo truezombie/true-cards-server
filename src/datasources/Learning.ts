@@ -1,7 +1,9 @@
 import moment from 'moment';
+import { ApolloError } from 'apollo-server-express';
 
 import { ModelSchemaCardSet } from '../db/schemas';
 import BaseDataSourceAPI from './BaseDataSource';
+import errorCodes from '../utils/error-codes';
 
 enum LEARNING_SESSION_TYPES {
   NEW_AND_FORGOT = 'NEW_AND_FORGOT',
@@ -62,9 +64,33 @@ class LearningAPI extends BaseDataSourceAPI {
       .slice(0, numberOfCards)
       .map((card) => card.uuid);
 
-    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession });
+    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession, currentLearningIndex: 0 });
 
     return 'OK';
+  }
+
+  async getCurrentLearningCard(cardSetId: string) {
+    await this.isExistUser();
+
+    const { currentLearningIndex, learningSession, cards } = await ModelSchemaCardSet.findOne({ _id: cardSetId });
+    const currentCardId = learningSession[currentLearningIndex];
+    const currentCard = cards.find((card) => currentCardId === card.uuid);
+
+    if (currentLearningIndex > learningSession.length) {
+      throw new ApolloError(errorCodes.ERROR_OUT_OF_CARD);
+    }
+
+    if (!currentCard) {
+      throw new ApolloError(errorCodes.ERROR_CARD_IS_NOT_EXIST);
+    }
+
+    return {
+      front: currentCard.front,
+      frontDescription: currentCard.frontDescription,
+      back: currentCard.back,
+      backDescription: currentCard.backDescription,
+      hasBackSide: currentCard.hasBackSide,
+    };
   }
 }
 

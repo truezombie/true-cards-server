@@ -52,6 +52,7 @@ class CardSetAPI extends BaseDataSourceAPI {
         name: data.name,
         cardsMax: DEFAULT_MAX_CARDS_IN_CARD_SET,
         learningSession: [],
+        currentLearningIndex: 0,
         cards: [],
       });
 

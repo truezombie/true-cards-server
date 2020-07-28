@@ -17,6 +17,7 @@ interface InterfaceSchemaCardSet extends Document {
   name: string;
   cardsMax: number;
   learningSession: string[];
+  currentLearningIndex: number;
   cards: [InterfaceCard];
 }
 
@@ -25,6 +26,7 @@ const SchemaCardSet: mongoose.Schema = new mongoose.Schema<InterfaceSchemaCardSe
   name: String,
   cardsMax: Number,
   learningSession: [String],
+  currentLearningIndex: Number,
   cards: [
     {
       uuid: String,

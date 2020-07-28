@@ -5,6 +5,8 @@ const typeDefs = gql`
     me: User
     cardSets: [CardSet]
     cardSetWithCards(cardSetId: String!): CardSet
+
+    getCurrentLearningCard(cardSetId: String!): CurrentLearningCard
   }
 
   type Mutation {
@@ -56,8 +58,7 @@ const typeDefs = gql`
     timesSuccess: Float
   }
 
-  type WillLearnedCards {
-    uuid: ID!
+  type CurrentLearningCard {
     front: String
     frontDescription: String
     back: String
