@@ -60,6 +60,12 @@ const resolversCardsSet = {
 
       return response;
     },
+
+    setNextLearningCard: async (_, { cardSetId, konwCurrentCard }, { dataSources }) => {
+      const response = await await dataSources.learningAPI.setNextLearningCard(cardSetId, konwCurrentCard);
+
+      return response;
+    },
   },
 };
 

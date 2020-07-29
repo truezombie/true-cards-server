@@ -73,6 +73,7 @@ class LearningAPI extends BaseDataSourceAPI {
     await this.isExistUser();
 
     const { currentLearningIndex, learningSession, cards } = await ModelSchemaCardSet.findOne({ _id: cardSetId });
+    console.log(currentLearningIndex);
     const currentCardId = learningSession[currentLearningIndex];
     const currentCard = cards.find((card) => currentCardId === card.uuid);
 
@@ -91,6 +92,16 @@ class LearningAPI extends BaseDataSourceAPI {
       backDescription: currentCard.backDescription,
       hasBackSide: currentCard.hasBackSide,
     };
+  }
+
+  async setNextLearningCard(cardSetId: string, konwCurrentCard: boolean) {
+    await this.isExistUser();
+
+    const { currentLearningIndex } = await ModelSchemaCardSet.findOne({ _id: cardSetId });
+
+    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { currentLearningIndex: currentLearningIndex + 1 });
+
+    return 'OK';
   }
 }
 

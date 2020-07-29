@@ -25,6 +25,7 @@ const typeDefs = gql`
     deleteCard(cardUuid: String!, cardSetId: String!): String
 
     startLearningSession(numberOfCards: Int!, cardSetId: String!, sessionType: String!): String
+    setNextLearningCard(cardSetId: String!, konwCurrentCard: Boolean!): String
   }
 
   type Tokens {
