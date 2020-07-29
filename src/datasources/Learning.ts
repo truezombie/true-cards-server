@@ -73,7 +73,6 @@ class LearningAPI extends BaseDataSourceAPI {
     await this.isExistUser();
 
     const { currentLearningIndex, learningSession, cards } = await ModelSchemaCardSet.findOne({ _id: cardSetId });
-    console.log(currentLearningIndex);
     const currentCardId = learningSession[currentLearningIndex];
     const currentCard = cards.find((card) => currentCardId === card.uuid);
 
