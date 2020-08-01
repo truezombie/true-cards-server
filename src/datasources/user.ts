@@ -47,7 +47,6 @@ class UserAPI extends BaseDataSourceAPI {
   }
 
   async signUp(dataUser) {
-    console.log(dataUser);
     const existUser = await ModelUser.findOne({ email: dataUser.email });
     const password = await bcrypt.hash(dataUser.password, config.bcryptRound);
     const NewUser = ModelUser;
