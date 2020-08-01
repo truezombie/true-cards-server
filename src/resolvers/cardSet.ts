@@ -61,8 +61,20 @@ const resolversCardsSet = {
       return response;
     },
 
-    setNextLearningCard: async (_, { cardSetId, konwCurrentCard }, { dataSources }) => {
-      const response = await await dataSources.learningAPI.setNextLearningCard(cardSetId, konwCurrentCard);
+    setNextLearningCard: async (_, { cardSetId, knowCurrentCard }, { dataSources }) => {
+      const response = await dataSources.learningAPI.setNextLearningCard(cardSetId, knowCurrentCard);
+
+      return response;
+    },
+
+    resetLearningSession: async (_, { cardSetId }, { dataSources }) => {
+      const response = await dataSources.learningAPI.resetLearningSession(cardSetId);
+
+      return response;
+    },
+
+    isExistLearningSession: async (_, { cardSetId }, { dataSources }) => {
+      const response = await dataSources.learningAPI.isExistLearningSession(cardSetId);
 
       return response;
     },

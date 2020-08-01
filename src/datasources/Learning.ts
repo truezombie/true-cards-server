@@ -76,8 +76,10 @@ class LearningAPI extends BaseDataSourceAPI {
     const currentCardId = learningSession[currentLearningIndex];
     const currentCard = cards.find((card) => currentCardId === card.uuid);
 
-    if (currentLearningIndex > learningSession.length) {
-      throw new ApolloError(errorCodes.ERROR_OUT_OF_CARD);
+    if (currentLearningIndex >= learningSession.length) {
+      await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession: [], currentLearningIndex: 0 });
+
+      throw new ApolloError(errorCodes.ERROR_OUT_OF_CARDS);
     }
 
     if (!currentCard) {
@@ -93,7 +95,7 @@ class LearningAPI extends BaseDataSourceAPI {
     };
   }
 
-  async setNextLearningCard(cardSetId: string, konwCurrentCard: boolean) {
+  async setNextLearningCard(cardSetId: string, knowCurrentCard: boolean) {
     await this.isExistUser();
 
     const { currentLearningIndex } = await ModelSchemaCardSet.findOne({ _id: cardSetId });
@@ -101,6 +103,21 @@ class LearningAPI extends BaseDataSourceAPI {
     await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { currentLearningIndex: currentLearningIndex + 1 });
 
     return 'OK';
+  }
+
+  async resetLearningSession(cardSetId: string) {
+    await this.isExistUser();
+    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession: [], currentLearningIndex: 0 });
+
+    return 'OK';
+  }
+
+  async isExistLearningSession(cardSetId: string) {
+    await this.isExistUser();
+
+    const { learningSession } = await ModelSchemaCardSet.findOne({ _id: cardSetId });
+
+    return learningSession.length !== 0;
   }
 }
 
