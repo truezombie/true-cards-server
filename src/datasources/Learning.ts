@@ -95,6 +95,7 @@ class LearningAPI extends BaseDataSourceAPI {
     };
   }
 
+  // eslint-disable-next-line
   async setNextLearningCard(cardSetId: string, knowCurrentCard: boolean) {
     await this.isExistUser();
 
