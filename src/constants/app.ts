@@ -1,1 +1,2 @@
-export const DEFAULT_MAX_CARDS_IN_CARD_SET = 50; // eslint-disable-line
+export const DEFAULT_MAX_CARD_SETS = 100;
+export const DEFAULT_MAX_CARDS_IN_CARD_SET = 500;

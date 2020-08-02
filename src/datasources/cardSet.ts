@@ -6,7 +6,7 @@ import { InterfaceSchemaCardSet, InterfaceCard, ModelSchemaCardSet } from '../db
 import errorCodes from '../utils/error-codes';
 import BaseDataSourceAPI from './BaseDataSource';
 
-import { DEFAULT_MAX_CARDS_IN_CARD_SET } from '../constants/app';
+import { DEFAULT_MAX_CARDS_IN_CARD_SET, DEFAULT_MAX_CARD_SETS } from '../constants/app';
 
 class CardSetAPI extends BaseDataSourceAPI {
   async getCardSets() {
@@ -42,22 +42,29 @@ class CardSetAPI extends BaseDataSourceAPI {
 
     const userId = await this.isExistUser();
     const existCardSet = await ModelSchemaCardSet.findOne({ name: data.name, userId });
+    const allCardSets = await ModelSchemaCardSet.find({
+      userId,
+    });
     const NewCardSet = ModelSchemaCardSet;
 
     if (existCardSet) {
       throw new ApolloError(errorCodes.ERROR_CARD_SET_EXIST);
-    } else {
-      const cardSet = new NewCardSet({
-        userId,
-        name: data.name,
-        cardsMax: DEFAULT_MAX_CARDS_IN_CARD_SET,
-        learningSession: [],
-        currentLearningIndex: 0,
-        cards: [],
-      });
-
-      await cardSet.save();
     }
+
+    if (allCardSets?.length + 1 >= DEFAULT_MAX_CARD_SETS) {
+      throw new ApolloError(errorCodes.ERROR_CARDS_SETS_LIMIT);
+    }
+
+    const cardSet = new NewCardSet({
+      userId,
+      name: data.name,
+      cardsMax: DEFAULT_MAX_CARDS_IN_CARD_SET,
+      learningSession: [],
+      currentLearningIndex: 0,
+      cards: [],
+    });
+
+    await cardSet.save();
 
     return 'OK';
   }
@@ -82,7 +89,6 @@ class CardSetAPI extends BaseDataSourceAPI {
     // TODO: need to validate back field
     // TODO: need to validate frontDescription field
     // TODO: need to validate backDescription field
-    // TODO: max cards for 1 set 50
 
     const predefinedCard: InterfaceCard = {
       uuid: uuidv4(),
@@ -95,6 +101,12 @@ class CardSetAPI extends BaseDataSourceAPI {
       timeLastSuccess: 0,
       timesSuccess: 0,
     };
+
+    const cardsAmount = (await ModelSchemaCardSet.findOne({ _id: cardSetId })).cards.length + 1;
+
+    if (cardsAmount >= DEFAULT_MAX_CARDS_IN_CARD_SET) {
+      throw new ApolloError(errorCodes.ERROR_LIMIT_CARDS_IN_CARD_SET);
+    }
 
     await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { $push: { cards: { ...predefinedCard, ...input } } });
 
