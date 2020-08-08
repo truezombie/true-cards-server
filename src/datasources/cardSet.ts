@@ -3,7 +3,7 @@ import { ApolloError } from 'apollo-server-express';
 import moment from 'moment';
 
 import { InterfaceSchemaCardSet, InterfaceCard, ModelSchemaCardSet } from '../db/schemas';
-import errorCodes from '../utils/error-codes';
+import ERROR_CODES from '../utils/error-codes';
 import BaseDataSourceAPI from './BaseDataSource';
 
 import { DEFAULT_MAX_CARDS_IN_CARD_SET, DEFAULT_MAX_CARD_SETS } from '../constants/app';
@@ -48,19 +48,17 @@ class CardSetAPI extends BaseDataSourceAPI {
     const NewCardSet = ModelSchemaCardSet;
 
     if (existCardSet) {
-      throw new ApolloError(errorCodes.ERROR_CARD_SET_EXIST);
+      throw new ApolloError(ERROR_CODES.ERROR_CARD_SET_EXIST);
     }
 
     if (allCardSets?.length + 1 >= DEFAULT_MAX_CARD_SETS) {
-      throw new ApolloError(errorCodes.ERROR_CARDS_SETS_LIMIT);
+      throw new ApolloError(ERROR_CODES.ERROR_OUT_OF_CARDS);
     }
 
     const cardSet = new NewCardSet({
       userId,
       name: data.name,
       cardsMax: DEFAULT_MAX_CARDS_IN_CARD_SET,
-      learningSession: [],
-      currentLearningIndex: 0,
       cards: [],
     });
 
@@ -105,7 +103,7 @@ class CardSetAPI extends BaseDataSourceAPI {
     const cardsAmount = (await ModelSchemaCardSet.findOne({ _id: cardSetId })).cards.length + 1;
 
     if (cardsAmount >= DEFAULT_MAX_CARDS_IN_CARD_SET) {
-      throw new ApolloError(errorCodes.ERROR_LIMIT_CARDS_IN_CARD_SET);
+      throw new ApolloError(ERROR_CODES.ERROR_EXCEEDED_LIMIT_CARDS_IN_CARD_SET);
     }
 
     await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { $push: { cards: { ...predefinedCard, ...input } } });

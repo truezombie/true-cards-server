@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 
 import { ModelUser } from '../db/schemas';
 import config from '../utils/config';
-import errorCodes from '../utils/error-codes';
+import ERROR_CODES from '../utils/error-codes';
 import BaseDataSourceAPI from './BaseDataSource';
 
 class UserAPI extends BaseDataSourceAPI {
@@ -26,12 +26,11 @@ class UserAPI extends BaseDataSourceAPI {
   async regenerateTokens(data) {
     try {
       const payload = jwt.verify(data.token, config.jwtSalt);
-
       const user = await ModelUser.findOne({ _id: payload.id });
 
       return this.generateTokens(user);
     } catch (e) {
-      throw new AuthenticationError(errorCodes.ERROR_TOKEN_REFRESH_IS_NOT_VALID);
+      throw new AuthenticationError(ERROR_CODES.ERROR_TOKEN_REFRESH_IS_NOT_VALID);
     }
   }
 
@@ -40,7 +39,7 @@ class UserAPI extends BaseDataSourceAPI {
     const isPasswordValid = await bcrypt.compare(dataUser.password, (user && user.password) || '');
 
     if (!user || !isPasswordValid) {
-      throw new AuthenticationError(errorCodes.ERROR_USER_NOT_EXIST);
+      throw new AuthenticationError(ERROR_CODES.ERROR_USER_NOT_EXIST);
     }
 
     return this.generateTokens(user);
@@ -53,7 +52,7 @@ class UserAPI extends BaseDataSourceAPI {
     const user = new NewUser({ ...dataUser, password });
 
     if (existUser) {
-      throw new AuthenticationError(errorCodes.ERROR_USER_EXIST);
+      throw new AuthenticationError(ERROR_CODES.ERROR_USER_EXIST);
     } else {
       await user.save();
     }

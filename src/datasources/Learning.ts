@@ -1,9 +1,9 @@
 import moment from 'moment';
 import { ApolloError } from 'apollo-server-express';
 
-import { ModelSchemaCardSet } from '../db/schemas';
+import { ModelSchemaCardSet, ModelUser } from '../db/schemas';
 import BaseDataSourceAPI from './BaseDataSource';
-import errorCodes from '../utils/error-codes';
+import ERROR_CODES from '../utils/error-codes';
 
 enum LEARNING_SESSION_TYPES {
   NEW_AND_FORGOT = 'NEW_AND_FORGOT',
@@ -44,6 +44,13 @@ class LearningAPI extends BaseDataSourceAPI {
   async startLearningSession(numberOfCards: number, cardSetId: string, sessionType: LEARNING_SESSION_TYPES) {
     // TODO: check that I can create learning session maybe session is exist
     // TODO: check that cards folder can be empty
+    const userId = await this.isExistUser();
+    const { learningSession: learningCardsArrayIds } = await ModelUser.findOne({
+      _id: userId,
+    });
+    if (learningCardsArrayIds.length !== 0) {
+      throw new ApolloError(ERROR_CODES.ERROR_LEARNING_SESSION_ALREADY_EXIST);
+    }
     const { cards } = await this.getCards(cardSetId);
 
     const learningSession = cards
@@ -64,26 +71,45 @@ class LearningAPI extends BaseDataSourceAPI {
       .slice(0, numberOfCards)
       .map((card) => card.uuid);
 
-    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession, currentLearningIndex: 0 });
+    await ModelUser.updateOne(
+      { _id: userId },
+      {
+        learningSession,
+        learningSessionCardSetId: cardSetId,
+        learningSessionCurrentCardIndex: 0,
+      }
+    );
 
     return 'OK';
   }
 
-  async getCurrentLearningCard(cardSetId: string) {
-    await this.isExistUser();
+  async getCurrentLearningCard() {
+    const userId = await this.isExistUser();
 
-    const { currentLearningIndex, learningSession, cards } = await ModelSchemaCardSet.findOne({ _id: cardSetId });
-    const currentCardId = learningSession[currentLearningIndex];
+    const { learningSession, learningSessionCardSetId, learningSessionCurrentCardIndex } = await ModelUser.findOne({
+      _id: userId,
+    });
+
+    if (learningSession.length === 0) {
+      throw new ApolloError(ERROR_CODES.ERROR_LEARNING_SESSION_IS_NOT_EXIST);
+    }
+
+    const { cards } = await this.getCards(learningSessionCardSetId);
+
+    const currentCardId = learningSession[learningSessionCurrentCardIndex];
     const currentCard = cards.find((card) => currentCardId === card.uuid);
 
-    if (currentLearningIndex >= learningSession.length) {
-      await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession: [], currentLearningIndex: 0 });
+    if (learningSessionCurrentCardIndex >= learningSession.length) {
+      await ModelUser.updateOne(
+        { _id: userId },
+        { learningSession: [], learningSessionCardSetId: '', learningSessionCurrentCardIndex: 0 }
+      );
 
-      throw new ApolloError(errorCodes.ERROR_OUT_OF_CARDS);
+      throw new ApolloError(ERROR_CODES.ERROR_OUT_OF_CARDS);
     }
 
     if (!currentCard) {
-      throw new ApolloError(errorCodes.ERROR_CARD_IS_NOT_EXIST);
+      throw new ApolloError(ERROR_CODES.ERROR_CARD_IS_NOT_EXIST);
     }
 
     return {
@@ -96,27 +122,32 @@ class LearningAPI extends BaseDataSourceAPI {
   }
 
   // eslint-disable-next-line
-  async setNextLearningCard(cardSetId: string, knowCurrentCard: boolean) {
-    await this.isExistUser();
+  async setNextLearningCard(knowCurrentCard: boolean) {
+    const userId = await this.isExistUser();
+    const { learningSessionCurrentCardIndex } = await ModelUser.findOne({ _id: userId });
 
-    const { currentLearningIndex } = await ModelSchemaCardSet.findOne({ _id: cardSetId });
-
-    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { currentLearningIndex: currentLearningIndex + 1 });
-
-    return 'OK';
-  }
-
-  async resetLearningSession(cardSetId: string) {
-    await this.isExistUser();
-    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { learningSession: [], currentLearningIndex: 0 });
+    await ModelUser.updateOne(
+      { _id: userId },
+      { learningSessionCurrentCardIndex: learningSessionCurrentCardIndex + 1 }
+    );
 
     return 'OK';
   }
 
-  async isExistLearningSession(cardSetId: string) {
-    await this.isExistUser();
+  async resetLearningSession() {
+    const userId = await this.isExistUser();
 
-    const { learningSession } = await ModelSchemaCardSet.findOne({ _id: cardSetId });
+    await ModelUser.updateOne(
+      { _id: userId },
+      { learningSession: [], learningSessionCardSetId: '', learningSessionCurrentCardIndex: 0 }
+    );
+
+    return 'OK';
+  }
+
+  async isExistLearningSession() {
+    const userId = await this.isExistUser();
+    const { learningSession } = await ModelUser.findOne({ _id: userId });
 
     return learningSession.length !== 0;
   }

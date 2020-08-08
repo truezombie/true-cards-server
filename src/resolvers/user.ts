@@ -26,6 +26,9 @@ const resolversUser = {
         password,
         firstName,
         lastName,
+        learningSession: [],
+        learningSessionCardSetId: '',
+        learningSessionCurrentCardIndex: 0,
       });
 
       return tokens;

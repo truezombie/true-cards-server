@@ -11,12 +11,6 @@ const resolversCardsSet = {
 
       return response;
     },
-
-    getCurrentLearningCard: async (_, { cardSetId }, { dataSources }) => {
-      const response = await dataSources.learningAPI.getCurrentLearningCard(cardSetId);
-
-      return response;
-    },
   },
   mutation: {
     createCardSet: async (_, { name }, { dataSources }) => {
@@ -51,30 +45,6 @@ const resolversCardsSet = {
 
     deleteCard: async (_, { cardUuid, cardSetId }, { dataSources }) => {
       const response = await dataSources.cardSetAPI.deleteCard(cardUuid, cardSetId);
-
-      return response;
-    },
-
-    startLearningSession: async (_, { numberOfCards, cardSetId, sessionType }, { dataSources }) => {
-      const response = await dataSources.learningAPI.startLearningSession(numberOfCards, cardSetId, sessionType);
-
-      return response;
-    },
-
-    setNextLearningCard: async (_, { cardSetId, knowCurrentCard }, { dataSources }) => {
-      const response = await dataSources.learningAPI.setNextLearningCard(cardSetId, knowCurrentCard);
-
-      return response;
-    },
-
-    resetLearningSession: async (_, { cardSetId }, { dataSources }) => {
-      const response = await dataSources.learningAPI.resetLearningSession(cardSetId);
-
-      return response;
-    },
-
-    isExistLearningSession: async (_, { cardSetId }, { dataSources }) => {
-      const response = await dataSources.learningAPI.isExistLearningSession(cardSetId);
 
       return response;
     },

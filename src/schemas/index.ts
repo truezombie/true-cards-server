@@ -6,7 +6,9 @@ const typeDefs = gql`
     cardSets: [CardSet]
     cardSetWithCards(cardSetId: String!): CardSet
 
-    getCurrentLearningCard(cardSetId: String!): CurrentLearningCard
+    getCurrentLearningCard: CurrentLearningCard
+    resetLearningSession: String
+    isExistLearningSession: Boolean
   }
 
   type Mutation {
@@ -25,9 +27,7 @@ const typeDefs = gql`
     deleteCard(cardUuid: String!, cardSetId: String!): String
 
     startLearningSession(numberOfCards: Int!, cardSetId: String!, sessionType: String!): String
-    setNextLearningCard(cardSetId: String!, knowCurrentCard: Boolean!): String
-    resetLearningSession(cardSetId: String!): String
-    isExistLearningSession(cardSetId: String!): Boolean
+    setNextLearningCard(knowCurrentCard: Boolean!): String
   }
 
   type Tokens {

@@ -4,7 +4,7 @@ import { AuthenticationError } from 'apollo-server-express';
 import { Mongoose } from 'mongoose';
 
 import config from '../utils/config';
-import errorCodes from '../utils/error-codes';
+import ERROR_CODES from '../utils/error-codes';
 
 class BaseDataSourceAPI extends DataSource {
   public context: {
@@ -22,7 +22,7 @@ class BaseDataSourceAPI extends DataSource {
 
       return tokenPayload.id;
     } catch (e) {
-      throw new AuthenticationError(errorCodes.ERROR_TOKEN_AUTH_IS_NOT_VALID);
+      throw new AuthenticationError(ERROR_CODES.ERROR_TOKEN_AUTH_IS_NOT_VALID);
     }
   }
 }
