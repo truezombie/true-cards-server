@@ -67,6 +67,8 @@ const typeDefs = gql`
     back: String
     backDescription: String
     hasBackSide: Boolean
+    index: Int
+    from: Int
   }
 
   type Card {

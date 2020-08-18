@@ -118,6 +118,8 @@ class LearningAPI extends BaseDataSourceAPI {
       back: currentCard.back,
       backDescription: currentCard.backDescription,
       hasBackSide: currentCard.hasBackSide,
+      index: learningSessionCurrentCardIndex,
+      from: learningSession.length,
     };
   }
 
