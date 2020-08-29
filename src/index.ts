@@ -8,6 +8,7 @@ import { UserAPI, CardSetAPI, LearningAPI } from './datasources';
 
 import connectToMongoDb from './db/connection';
 
+const app = express();
 const mongoClient = connectToMongoDb();
 
 const apolloServer = new ApolloServer({
@@ -25,8 +26,6 @@ const apolloServer = new ApolloServer({
     learningAPI: new LearningAPI(),
   }),
 });
-
-const app = express();
 
 apolloServer.applyMiddleware({ app });
 
