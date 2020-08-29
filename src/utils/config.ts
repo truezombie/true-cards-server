@@ -13,6 +13,4 @@ const config = {
   jwtRefreshTokenTimeLife: process.env.JWT_TTL_REFRESH_TOKEN,
 };
 
-console.log(config);
-
 export default config;
