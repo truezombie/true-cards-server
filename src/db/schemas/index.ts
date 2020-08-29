@@ -3,10 +3,10 @@ import { SchemaCardSet, ModelSchemaCardSet, InterfaceSchemaCardSet, InterfaceCar
 
 export {
   SchemaUser,
-  ModelUser,
-  InterfaceSchemaUser,
   SchemaCardSet,
+  ModelUser,
   ModelSchemaCardSet,
+  InterfaceSchemaUser,
   InterfaceSchemaCardSet,
   InterfaceCard,
 };

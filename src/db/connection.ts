@@ -2,9 +2,9 @@ import mongoose from 'mongoose';
 
 import config from '../utils/config';
 
-const dbPath = `mongodb://${config.dbUser}:${config.dbPassword}@${config.dbHost}:${config.dbPort}/${config.dbName}`;
+const dbPath = `mongodb+srv://${config.dbUser}:${config.dbPassword}@${config.dbHost}/${config.dbName}?retryWrites=true&w=majority`;
 
-const connectToMongoDb = async (cb) => {
+const connectToMongoDb = async cb => {
   try {
     const db = await mongoose.connect(dbPath, {
       useNewUrlParser: true,

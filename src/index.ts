@@ -30,8 +30,8 @@ const apolloServerStart = (mongoClient) => {
   server.applyMiddleware({ app });
 
   app.listen(
-    { port: 4000 },
-    () => console.log(`Server ready at http://localhost:4000${server.graphqlPath}`) // eslint-disable-line no-console
+    { port: 3000 },
+    () => console.log(`Server ready at http://localhost:3000${server.graphqlPath}`) // eslint-disable-line no-console
   );
 };
 

@@ -7,7 +7,6 @@ const config = {
   dbPassword: process.env.DB_PASSWORD,
   dbHost: process.env.DB_HOST,
   dbName: process.env.DB_name,
-  dbPort: process.env.DB_PORT,
   bcryptRound: Number(process.env.BCRYPT_ROUND),
   jwtSalt: process.env.JWT_SALT,
   jwtAuthTokenTimeLife: process.env.JWT_TTL_AUTH_TOKEN,
