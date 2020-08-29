@@ -4,7 +4,7 @@ import config from '../utils/config';
 
 const dbPath = `mongodb+srv://${config.dbUser}:${config.dbPassword}@${config.dbHost}/${config.dbName}?retryWrites=true&w=majority`;
 
-const connectToMongoDb = async (cb) => {
+const connectToMongoDb = async () => {
   try {
     const db = await mongoose.connect(dbPath, {
       useNewUrlParser: true,
@@ -13,7 +13,7 @@ const connectToMongoDb = async (cb) => {
 
     console.log('MongoDB has been connected'); // eslint-disable-line no-console
 
-    return cb(db);
+    return db;
   } catch (err) {
     throw new Error(`MongoDB: connection failed ${err}`);
   }

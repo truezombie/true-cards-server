@@ -8,31 +8,36 @@ import { UserAPI, CardSetAPI, LearningAPI } from './datasources';
 
 import connectToMongoDb from './db/connection';
 
-const apolloServerStart = (mongoClient) => {
-  const server = new ApolloServer({
-    context: async ({ req }) => {
-      return {
-        token: req.headers?.authorization,
-        mongoClient,
-      };
-    },
-    typeDefs,
-    resolvers,
-    dataSources: () => ({
-      userAPI: new UserAPI(),
-      cardSetAPI: new CardSetAPI(),
-      learningAPI: new LearningAPI(),
-    }),
-  });
+const mongoClient = connectToMongoDb();
 
-  const app = express();
+const apolloServer = new ApolloServer({
+  context: async ({ req }) => {
+    return {
+      token: req.headers?.authorization,
+      mongoClient,
+    };
+  },
+  typeDefs,
+  resolvers,
+  dataSources: () => ({
+    userAPI: new UserAPI(),
+    cardSetAPI: new CardSetAPI(),
+    learningAPI: new LearningAPI(),
+  }),
+});
 
-  server.applyMiddleware({ app });
+const app = express();
 
-  app.listen(
-    { port: 3000 },
-    () => console.log(`Server ready at http://localhost:3000${server.graphqlPath}`) // eslint-disable-line no-console
-  );
+apolloServer.applyMiddleware({ app });
+
+const server = app.listen(
+  { port: 3000 },
+  () => console.log(`Server ready at http://localhost:3000${apolloServer.graphqlPath}`) // eslint-disable-line no-console
+);
+
+const stop = () => {
+  server.close();
 };
 
-connectToMongoDb(apolloServerStart);
+module.exports = app;
+module.exports.stop = stop;

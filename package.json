@@ -11,7 +11,7 @@
     "test": "jest --notify --detectOpenHandles --config=jest.config.js",
     "lint": "eslint --ext=.js,.ts src",
     "lint:fix": "eslint --ext=.js,.ts src --fix",
-    "start": "npm run build",
+    "start": "npm run build && node build/index.js",
     "test:coverage": "jest --coverage"
   },
   "husky": {

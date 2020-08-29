@@ -2,7 +2,8 @@ module.exports = {
   apps: [
     {
       name: 'true-cards-server',
-      script: './build/index.js',
+      script: 'npm',
+      args: 'start',
     },
   ],
 };
