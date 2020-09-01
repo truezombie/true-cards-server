@@ -9,5 +9,6 @@ ssh ubuntu@3.122.59.81 <<EOF
     npm install
     npm install -g nodemon pm2
     pm2 restart ecosystem.config.js
+    pm2 logs true-cards-server
     exit
 EOF
