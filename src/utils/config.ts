@@ -1,8 +1,6 @@
 import dotenv from 'dotenv';
 
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config();
-}
+dotenv.config();
 
 const config = {
   dbUser: process.env.DB_USER,
