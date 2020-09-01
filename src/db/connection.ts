@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 import config from '../utils/config';
 
+console.log(config, process.env);
 const dbPath = `mongodb+srv://${config.dbUser}:${config.dbPassword}@${config.dbHost}/${config.dbName}?retryWrites=true&w=majority`;
 
 const connectToMongoDb = async () => {
