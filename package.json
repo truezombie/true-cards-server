@@ -26,6 +26,7 @@
     "@types/jest": "^25.1.4",
     "@types/mongoose": "^5.7.20",
     "@types/node": "^14.0.1",
+    "@types/nodemailer": "^6.4.0",
     "@typescript-eslint/eslint-plugin": "^2.23.0",
     "@typescript-eslint/parser": "^2.24.0",
     "eslint": "^7.0.0",
@@ -53,6 +54,7 @@
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.25.3",
     "mongoose": "^5.9.13",
+    "nodemailer": "^6.4.11",
     "uuid": "^8.0.0"
   }
 }

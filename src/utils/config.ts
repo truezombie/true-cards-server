@@ -11,6 +11,8 @@ const config = {
   jwtSalt: process.env.JWT_SALT,
   jwtAuthTokenTimeLife: process.env.JWT_TTL_AUTH_TOKEN,
   jwtRefreshTokenTimeLife: process.env.JWT_TTL_REFRESH_TOKEN,
+  emailAddress: process.env.EMAIL_ADDRESS,
+  emailPassword: process.env.EMAIL_PASSWORD,
 };
 
 export default config;

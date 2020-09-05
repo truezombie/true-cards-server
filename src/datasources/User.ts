@@ -1,4 +1,6 @@
 import { AuthenticationError } from 'apollo-server-express';
+import { v4 as uuidv4 } from 'uuid';
+import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
@@ -65,6 +67,58 @@ class UserAPI extends BaseDataSourceAPI {
     const user = await ModelUser.findOne({ _id: userId });
 
     return user;
+  }
+
+  async resetPassword({ confirmationKey, password }) {
+    const existUser = await ModelUser.findOne({ passwordResetConfirmationKey: confirmationKey });
+    const bCryptedPassword = await bcrypt.hash(password, config.bcryptRound);
+
+    if (!existUser) {
+      throw new AuthenticationError(ERROR_CODES.CONFIRMATION_KEY_IS_NOT_CORRECT);
+    } else {
+      await ModelUser.updateOne(
+        { passwordResetConfirmationKey: confirmationKey },
+        { password: bCryptedPassword, passwordResetConfirmationKey: '' }
+      );
+    }
+
+    return this.generateTokens(existUser);
+  }
+
+  // TODO: need to refactor
+  // eslint-disable-next-line class-methods-use-this
+  async setResetPasswordVerifyKey({ email }) {
+    const existUser = await ModelUser.findOne({ email });
+
+    if (!existUser) {
+      throw new AuthenticationError(ERROR_CODES.ERROR_USER_NOT_EXIST);
+    } else {
+      const passwordResetConfirmationKey = uuidv4();
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: config.emailAddress,
+          pass: config.emailPassword,
+        },
+      });
+
+      await ModelUser.updateOne({ email }, { passwordResetConfirmationKey });
+
+      await transporter.sendMail({
+        from: config.emailAddress,
+        to: existUser.email,
+        subject: 'Password reset',
+        text: `Hi ${existUser.firstName} ${existUser.lastName}. Your confirmation key is: ${passwordResetConfirmationKey} If your have a question please sand me email: ${config.emailAddress}`,
+        html: `
+            <div>
+                <h3>Hi ${existUser.firstName} ${existUser.lastName}</h3>
+                <p>Your confirmation key is: <b>${passwordResetConfirmationKey}</b></p>
+                <small>If your have a question please sand me email: <a href="mailto:${config.emailAddress}">${config.emailAddress}</a></small>
+            </div>`,
+      });
+    }
+
+    return 'OK';
   }
 }
 
