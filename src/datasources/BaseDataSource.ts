@@ -1,6 +1,7 @@
 import { DataSource } from 'apollo-datasource';
 import jwt from 'jsonwebtoken';
 import { AuthenticationError } from 'apollo-server-express';
+import nodemailer from 'nodemailer';
 import { Mongoose } from 'mongoose';
 
 import config from '../utils/config';
@@ -15,6 +16,14 @@ class BaseDataSourceAPI extends DataSource {
   initialize(conf) {
     this.context = conf.context;
   }
+
+  transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: config.emailAddress,
+      pass: config.emailPassword,
+    },
+  });
 
   async isExistUser() {
     try {

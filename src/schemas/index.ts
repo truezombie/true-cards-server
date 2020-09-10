@@ -18,6 +18,7 @@ const typeDefs = gql`
 
     signUp(email: String!, password: String!, firstName: String!, lastName: String!): Tokens
     resetPassword(confirmationKey: String!, password: String!): Tokens
+    setPreRegistrationEmail(email: String!): String
     setResetPasswordVerifyKey(email: String!): String
 
     createCardSet(name: String!): String

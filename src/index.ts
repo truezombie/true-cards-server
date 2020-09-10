@@ -4,7 +4,7 @@ import { ApolloServer } from 'apollo-server-express';
 import typeDefs from './schemas';
 import resolvers from './resolvers';
 
-import { UserAPI, CardSetAPI, LearningAPI } from './datasources';
+import { UserAPI, CardSetAPI, LearningAPI, PreRegisteredUserAPI } from './datasources';
 
 import connectToMongoDb from './db/connection';
 
@@ -24,6 +24,7 @@ const apolloServer = new ApolloServer({
     userAPI: new UserAPI(),
     cardSetAPI: new CardSetAPI(),
     learningAPI: new LearningAPI(),
+    preRegisteredUserAPI: new PreRegisteredUserAPI(),
   }),
 });
 
