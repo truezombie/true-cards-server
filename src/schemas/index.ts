@@ -16,10 +16,11 @@ const typeDefs = gql`
 
     signIn(email: String!, password: String!): Tokens
 
-    signUp(email: String!, password: String!, firstName: String!, lastName: String!): Tokens
+    signUp(linkUuid: String!, password: String!, firstName: String!, lastName: String!): Tokens
     resetPassword(confirmationKey: String!, password: String!): Tokens
     setPreRegistrationEmail(email: String!): String
     setResetPasswordVerifyKey(email: String!): String
+    checkUserRegistrationLinkUuid(uuid: String!): String
 
     createCardSet(name: String!): String
     updateCardSet(cardSetId: String!, name: String!): String

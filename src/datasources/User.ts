@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
-import { ModelUser } from '../db/schemas';
+import { ModelUser, ModelPreRegisteredUser } from '../db/schemas';
 import config from '../utils/config';
 import ERROR_CODES from '../utils/error-codes';
 import { getForgotPasswordEmail } from '../utils/emails';
@@ -47,18 +47,30 @@ class UserAPI extends BaseDataSourceAPI {
     return this.generateTokens(user);
   }
 
-  async signUp(dataUser) {
-    const existUser = await ModelUser.findOne({ email: dataUser.email });
-    const password = await bcrypt.hash(dataUser.password, config.bcryptRound);
+  async signUp({ linkUuid, password, firstName, lastName }) {
+    const preRegisterUser = await ModelPreRegisteredUser.findOne({ currentLinkUuid: linkUuid });
+    const bcryptPassword = await bcrypt.hash(password, config.bcryptRound);
     const NewUser = ModelUser;
-    const user = new NewUser({ ...dataUser, password });
 
-    if (existUser) {
-      throw new AuthenticationError(ERROR_CODES.ERROR_USER_EXIST);
-    } else {
-      await user.save();
+    if (!preRegisterUser) {
+      throw new AuthenticationError(ERROR_CODES.ERROR_PRE_REGISTERED_DATA_NOT_FOUND);
     }
 
+    const dataUser = {
+      email: preRegisterUser.email,
+      password: bcryptPassword,
+      firstName,
+      lastName,
+      learningSession: [],
+      learningSessionCardSetId: '',
+      learningSessionCurrentCardIndex: 0,
+      passwordResetConfirmationKey: '',
+    };
+
+    const user = new NewUser(dataUser);
+    await user.save();
+
+    await ModelPreRegisteredUser.deleteOne({ currentLinkUuid: linkUuid });
     return this.generateTokens(user);
   }
 
@@ -74,7 +86,7 @@ class UserAPI extends BaseDataSourceAPI {
     const bCryptedPassword = await bcrypt.hash(password, config.bcryptRound);
 
     if (!existUser) {
-      throw new AuthenticationError(ERROR_CODES.CONFIRMATION_KEY_IS_NOT_CORRECT);
+      throw new AuthenticationError(ERROR_CODES.ERROR_CONFIRMATION_KEY_IS_NOT_CORRECT);
     } else {
       await ModelUser.updateOne(
         { passwordResetConfirmationKey: confirmationKey },

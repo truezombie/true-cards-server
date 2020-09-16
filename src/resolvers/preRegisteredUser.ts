@@ -8,6 +8,14 @@ const preRegisteredUser = {
 
       return response;
     },
+
+    checkUserRegistrationLinkUuid: async (_, { uuid }, { dataSources }) => {
+      const response = await dataSources.preRegisteredUserAPI.checkUserRegistrationLinkUuid({
+        uuid,
+      });
+
+      return response;
+    },
   },
 };
 

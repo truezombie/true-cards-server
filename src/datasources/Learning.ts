@@ -5,6 +5,7 @@ import { ModelSchemaCardSet, ModelUser } from '../db/schemas';
 import BaseDataSourceAPI from './BaseDataSource';
 import ERROR_CODES from '../utils/error-codes';
 
+// eslint-disable-next-line no-shadow
 enum LEARNING_SESSION_TYPES {
   NEW_AND_FORGOT = 'NEW_AND_FORGOT',
   NEW = 'NEW',

@@ -22,16 +22,12 @@ const resolversUser = {
       return tokens;
     },
 
-    signUp: async (_, { email, password, firstName, lastName }, { dataSources }) => {
+    signUp: async (_, { linkUuid, password, firstName, lastName }, { dataSources }) => {
       const tokens = await dataSources.userAPI.signUp({
-        email,
+        linkUuid,
         password,
         firstName,
         lastName,
-        learningSession: [],
-        learningSessionCardSetId: '',
-        learningSessionCurrentCardIndex: 0,
-        passwordResetConfirmationKey: '',
       });
 
       return tokens;
