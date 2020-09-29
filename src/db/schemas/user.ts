@@ -9,6 +9,7 @@ interface InterfaceSchemaUser extends mongoose.Document {
   learningSessionCardSetId: string;
   learningSessionCurrentCardIndex: number;
   passwordResetConfirmationKey: string;
+  forgettingIndex: number;
 }
 
 const SchemaUser: mongoose.Schema = new mongoose.Schema<InterfaceSchemaUser>({
@@ -20,6 +21,7 @@ const SchemaUser: mongoose.Schema = new mongoose.Schema<InterfaceSchemaUser>({
   learningSessionCardSetId: String,
   learningSessionCurrentCardIndex: Number,
   passwordResetConfirmationKey: String,
+  forgettingIndex: Number,
 });
 
 const ModelUser = mongoose.model<InterfaceSchemaUser>('User', SchemaUser);

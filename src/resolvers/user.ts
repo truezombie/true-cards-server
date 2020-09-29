@@ -49,6 +49,14 @@ const resolversUser = {
 
       return response;
     },
+
+    updateForgettingIndex: async (_, { forgettingIndex }, { dataSources }) => {
+      const response = await dataSources.userAPI.updateForgettingIndex({
+        forgettingIndex,
+      });
+
+      return response;
+    },
   },
 };
 

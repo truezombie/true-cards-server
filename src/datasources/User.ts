@@ -65,6 +65,7 @@ class UserAPI extends BaseDataSourceAPI {
       learningSessionCardSetId: '',
       learningSessionCurrentCardIndex: 0,
       passwordResetConfirmationKey: '',
+      forgettingIndex: 1,
     };
 
     const user = new NewUser(dataUser);
@@ -111,6 +112,14 @@ class UserAPI extends BaseDataSourceAPI {
         getForgotPasswordEmail(existUser.firstName, existUser.lastName, existUser.email, passwordResetConfirmationKey)
       );
     }
+
+    return 'OK';
+  }
+
+  async updateForgettingIndex({ forgettingIndex }) {
+    const userId = await this.isExistUser();
+
+    await ModelUser.updateOne({ _id: userId }, { forgettingIndex });
 
     return 'OK';
   }

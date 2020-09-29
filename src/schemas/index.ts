@@ -22,6 +22,8 @@ const typeDefs = gql`
     setResetPasswordVerifyKey(email: String!): String
     checkUserRegistrationLinkUuid(uuid: String!): String
 
+    updateForgettingIndex(forgettingIndex: Int!): String
+
     createCardSet(name: String!): String
     updateCardSet(cardSetId: String!, name: String!): String
     deleteCardSet(cardSetId: String!): String
@@ -44,6 +46,7 @@ const typeDefs = gql`
     email: String!
     firstName: String!
     lastName: String!
+    forgettingIndex: Int!
   }
 
   input CardUpdateInput {
