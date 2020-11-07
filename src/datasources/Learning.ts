@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { ApolloError } from 'apollo-server-express';
 
-import { ModelSchemaCardSet, ModelUser } from '../db/schemas';
+import { ModelSchemaCard, ModelUser } from '../db/schemas';
 import BaseDataSourceAPI from './BaseDataSource';
 import ERROR_CODES from '../utils/error-codes';
 
@@ -32,8 +32,8 @@ class LearningAPI extends BaseDataSourceAPI {
 
   async getCards(cardSetId: string) {
     const user = await this.isExistUser();
-    const { cards = [] } = await ModelSchemaCardSet.findOne({
-      _id: cardSetId,
+    const cards = await ModelSchemaCard.find({
+      cardSetId,
     });
 
     return {
@@ -70,7 +70,7 @@ class LearningAPI extends BaseDataSourceAPI {
         }
       })
       .slice(0, numberOfCards)
-      .map((card) => card.uuid);
+      .map((card) => card._id);
 
     await ModelUser.updateOne(
       { _id: userId },
@@ -98,12 +98,16 @@ class LearningAPI extends BaseDataSourceAPI {
     const { cards } = await this.getCards(learningSessionCardSetId);
 
     const currentCardId = learningSession[learningSessionCurrentCardIndex];
-    const currentCard = cards.find((card) => currentCardId === card.uuid);
+    const currentCard = cards.find((card) => currentCardId === card._id);
 
     if (learningSessionCurrentCardIndex >= learningSession.length) {
       await ModelUser.updateOne(
         { _id: userId },
-        { learningSession: [], learningSessionCardSetId: '', learningSessionCurrentCardIndex: 0 }
+        {
+          learningSession: [],
+          learningSessionCardSetId: '',
+          learningSessionCurrentCardIndex: 0,
+        }
       );
 
       throw new ApolloError(ERROR_CODES.ERROR_OUT_OF_CARDS);
@@ -127,7 +131,9 @@ class LearningAPI extends BaseDataSourceAPI {
   // eslint-disable-next-line
   async setNextLearningCard(knowCurrentCard: boolean) {
     const userId = await this.isExistUser();
-    const { learningSessionCurrentCardIndex } = await ModelUser.findOne({ _id: userId });
+    const { learningSessionCurrentCardIndex } = await ModelUser.findOne({
+      _id: userId,
+    });
 
     await ModelUser.updateOne(
       { _id: userId },
@@ -142,7 +148,11 @@ class LearningAPI extends BaseDataSourceAPI {
 
     await ModelUser.updateOne(
       { _id: userId },
-      { learningSession: [], learningSessionCardSetId: '', learningSessionCurrentCardIndex: 0 }
+      {
+        learningSession: [],
+        learningSessionCardSetId: '',
+        learningSessionCurrentCardIndex: 0,
+      }
     );
 
     return 'OK';

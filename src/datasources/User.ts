@@ -48,7 +48,9 @@ class UserAPI extends BaseDataSourceAPI {
   }
 
   async signUp({ linkUuid, password, firstName, lastName }) {
-    const preRegisterUser = await ModelPreRegisteredUser.findOne({ currentLinkUuid: linkUuid });
+    const preRegisterUser = await ModelPreRegisteredUser.findOne({
+      currentLinkUuid: linkUuid,
+    });
     const bcryptPassword = await bcrypt.hash(password, config.bcryptRound);
     const NewUser = ModelUser;
 
@@ -83,7 +85,9 @@ class UserAPI extends BaseDataSourceAPI {
   }
 
   async resetPassword({ confirmationKey, password }) {
-    const existUser = await ModelUser.findOne({ passwordResetConfirmationKey: confirmationKey });
+    const existUser = await ModelUser.findOne({
+      passwordResetConfirmationKey: confirmationKey,
+    });
     const bCryptedPassword = await bcrypt.hash(password, config.bcryptRound);
 
     if (!existUser) {

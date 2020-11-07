@@ -1,13 +1,7 @@
 const resolversCardsSet = {
   query: {
-    cardSets: async (_, __, { dataSources }) => {
-      const response = await dataSources.cardSetAPI.getCardSets();
-
-      return response;
-    },
-
-    cardSetWithCards: async (_, { cardSetId }, { dataSources }) => {
-      const response = await dataSources.cardSetAPI.getCardSetWithCards(cardSetId);
+    cardSets: async (_, { search, page, rowsPerPage }, { dataSources }) => {
+      const response = await dataSources.cardSetAPI.getCardSets(search, page, rowsPerPage);
 
       return response;
     },
@@ -27,24 +21,6 @@ const resolversCardsSet = {
 
     deleteCardSet: async (_, { cardSetId }, { dataSources }) => {
       const response = await dataSources.cardSetAPI.deleteCardSet(cardSetId);
-
-      return response;
-    },
-
-    createCard: async (_, { input, cardSetId }, { dataSources }) => {
-      const response = await dataSources.cardSetAPI.createCard(input, cardSetId);
-
-      return response;
-    },
-
-    updateCard: async (_, { input, cardSetId, uuid }, { dataSources }) => {
-      const response = await dataSources.cardSetAPI.updateCard(input, cardSetId, uuid);
-
-      return response;
-    },
-
-    deleteCard: async (_, { cardUuid, cardSetId }, { dataSources }) => {
-      const response = await dataSources.cardSetAPI.deleteCard(cardUuid, cardSetId);
 
       return response;
     },

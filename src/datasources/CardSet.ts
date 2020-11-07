@@ -1,39 +1,41 @@
-import { v4 as uuidv4 } from 'uuid';
 import { ApolloError } from 'apollo-server-express';
-import moment from 'moment';
 
-import { InterfaceSchemaCardSet, InterfaceCard, ModelSchemaCardSet } from '../db/schemas';
+import { InterfaceSchemaCardSet, ModelSchemaCardSet } from '../db/schemas';
 import ERROR_CODES from '../utils/error-codes';
 import BaseDataSourceAPI from './BaseDataSource';
 
 import { DEFAULT_MAX_CARDS_IN_CARD_SET, DEFAULT_MAX_CARD_SETS } from '../constants/app';
 
 class CardSetAPI extends BaseDataSourceAPI {
-  async getCardSets() {
+  async getCardSets(search, page, rowsPerPage) {
     const userId = await this.isExistUser();
+    // TODO: need to refactor
+    const count = await ModelSchemaCardSet.find({
+      userId,
+      name: { $regex: search },
+    }).countDocuments({ userId });
+
     const allCardSets = await ModelSchemaCardSet.find({
       userId,
-    });
+      name: { $regex: search },
+    })
+      .limit(rowsPerPage)
+      .skip(page * rowsPerPage);
 
-    return allCardSets.map((item) => {
+    const cardSets = allCardSets.map((item) => {
       return {
         id: item._id,
         userId: item.userId,
         name: item.name,
         cardsMax: item.cardsMax,
-        cardsAll: item.cards.length,
-        cards: item.cards,
+        cardsAll: 0, // TODO: need to fix
       };
     });
-  }
 
-  async getCardSetWithCards(cardSetId: string) {
-    await this.isExistUser();
-    const cardSet = await ModelSchemaCardSet.findOne({
-      _id: cardSetId,
-    });
-
-    return cardSet;
+    return {
+      cardSets,
+      count,
+    };
   }
 
   async createCardSet(data: InterfaceSchemaCardSet) {
@@ -52,14 +54,13 @@ class CardSetAPI extends BaseDataSourceAPI {
     }
 
     if (allCardSets?.length + 1 >= DEFAULT_MAX_CARD_SETS) {
-      throw new ApolloError(ERROR_CODES.ERROR_OUT_OF_CARDS);
+      throw new ApolloError(ERROR_CODES.ERROR_EXCEEDED_LIMIT_CARDS_SETS);
     }
 
     const cardSet = new NewCardSet({
       userId,
       name: data.name,
       cardsMax: DEFAULT_MAX_CARDS_IN_CARD_SET,
-      cards: [],
     });
 
     await cardSet.save();
@@ -77,61 +78,6 @@ class CardSetAPI extends BaseDataSourceAPI {
   async deleteCardSet(cardSetId: string) {
     await this.isExistUser();
     await ModelSchemaCardSet.deleteOne({ _id: cardSetId });
-
-    return 'OK';
-  }
-
-  async createCard(input: InterfaceCard, cardSetId: string) {
-    await this.isExistUser();
-    // TODO: need to validate front field
-    // TODO: need to validate back field
-    // TODO: need to validate frontDescription field
-    // TODO: need to validate backDescription field
-
-    const predefinedCard: InterfaceCard = {
-      uuid: uuidv4(),
-      front: '',
-      frontDescription: '',
-      back: '',
-      backDescription: '',
-      hasBackSide: false,
-      timeAdded: moment().valueOf(),
-      timeLastSuccess: 0,
-      timesSuccess: 0,
-    };
-
-    const cardsAmount = (await ModelSchemaCardSet.findOne({ _id: cardSetId })).cards.length + 1;
-
-    if (cardsAmount >= DEFAULT_MAX_CARDS_IN_CARD_SET) {
-      throw new ApolloError(ERROR_CODES.ERROR_EXCEEDED_LIMIT_CARDS_IN_CARD_SET);
-    }
-
-    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { $push: { cards: { ...predefinedCard, ...input } } });
-
-    return 'OK';
-  }
-
-  async updateCard(input: InterfaceCard, cardSetId: string, uuid: string) {
-    await this.isExistUser();
-    await ModelSchemaCardSet.findOneAndUpdate(
-      { _id: cardSetId, cards: { $elemMatch: { uuid } } },
-      {
-        $set: {
-          'cards.$.front': input.front,
-          'cards.$.frontDescription': input.frontDescription,
-          'cards.$.back': input.back,
-          'cards.$.backDescription': input.backDescription,
-          'cards.$.hasBackSide': input.hasBackSide,
-        },
-      }
-    );
-
-    return 'OK';
-  }
-
-  async deleteCard(cardUuid: string, cardSetId: string) {
-    await this.isExistUser();
-    await ModelSchemaCardSet.updateOne({ _id: cardSetId }, { $pull: { cards: { uuid: cardUuid } } });
 
     return 'OK';
   }

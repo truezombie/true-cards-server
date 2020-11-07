@@ -3,12 +3,13 @@ import { gql } from 'apollo-server-express';
 const typeDefs = gql`
   type Query {
     me: User
-    cardSets: [CardSet]
-    cardSetWithCards(cardSetId: String!): CardSet
+    cardSets(search: String!, page: Int!, rowsPerPage: Int!): CardSets
 
     getCurrentLearningCard: CurrentLearningCard
     resetLearningSession: String
     isExistLearningSession: Boolean
+
+    cards(cardSetId: String!, search: String!, page: Int!, rowsPerPage: Int!): CardsOutput
   }
 
   type Mutation {
@@ -28,12 +29,17 @@ const typeDefs = gql`
     updateCardSet(cardSetId: String!, name: String!): String
     deleteCardSet(cardSetId: String!): String
 
-    createCard(input: CardCreateInput!, cardSetId: String!): String
-    updateCard(input: CardUpdateInput!, cardSetId: String!, uuid: String!): String
-    deleteCard(cardUuid: String!, cardSetId: String!): String
+    createCard(input: CardCreateInput!): String
+    updateCard(input: CardUpdateInput!, cardId: String!): String
+    deleteCard(cardId: String!): String
 
     startLearningSession(numberOfCards: Int!, cardSetId: String!, sessionType: String!): String
     setNextLearningCard(knowCurrentCard: Boolean!): String
+  }
+
+  type CardSets {
+    cardSets: [CardSet]
+    count: Int
   }
 
   type Tokens {
@@ -58,6 +64,7 @@ const typeDefs = gql`
   }
 
   input CardCreateInput {
+    cardSetId: String!
     front: String!
     frontDescription: String
     back: String
@@ -80,7 +87,7 @@ const typeDefs = gql`
 
   type Card {
     id: ID!
-    uuid: ID!
+    cardSetId: String!
     front: String!
     frontDescription: String
     back: String
@@ -98,6 +105,18 @@ const typeDefs = gql`
     cardsMax: Int!
     cardsAll: Int!
     cards: [Card]
+  }
+
+  type CardSetWithCards {
+    cardsAll: Int!
+    cardSet: CardSet
+  }
+
+  type CardsOutput {
+    count: Int!
+    cards: [Card]
+    cardSetName: String!
+    cardsMax: Int!
   }
 `;
 

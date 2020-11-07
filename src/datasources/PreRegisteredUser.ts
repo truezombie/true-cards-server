@@ -24,7 +24,9 @@ class PreRegisteredUserAPI extends BaseDataSourceAPI {
 
   // eslint-disable-next-line class-methods-use-this
   async checkUserRegistrationLinkUuid({ uuid }) {
-    const userWhoWaitingRegistration = await ModelPreRegisteredUser.findOne({ currentLinkUuid: uuid });
+    const userWhoWaitingRegistration = await ModelPreRegisteredUser.findOne({
+      currentLinkUuid: uuid,
+    });
 
     if (!userWhoWaitingRegistration) {
       throw new AuthenticationError(ERROR_CODES.ERROR_PRE_REGISTERED_DATA_NOT_FOUND);
