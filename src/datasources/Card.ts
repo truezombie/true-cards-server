@@ -29,6 +29,7 @@ class CardAPI extends BaseDataSourceAPI {
 
     const count = await ModelSchemaCard.find({
       cardSetId,
+      $or: [{ front: { $regex: search } }, { back: { $regex: search } }],
     }).countDocuments({ cardSetId });
 
     const cards = await ModelSchemaCard.find({
