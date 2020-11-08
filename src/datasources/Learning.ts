@@ -70,7 +70,7 @@ class LearningAPI extends BaseDataSourceAPI {
         }
       })
       .slice(0, numberOfCards)
-      .map((card) => card._id);
+      .map((card) => card.id);
 
     await ModelUser.updateOne(
       { _id: userId },
@@ -98,7 +98,7 @@ class LearningAPI extends BaseDataSourceAPI {
     const { cards } = await this.getCards(learningSessionCardSetId);
 
     const currentCardId = learningSession[learningSessionCurrentCardIndex];
-    const currentCard = cards.find((card) => currentCardId === card._id);
+    const currentCard = cards.find((card) => currentCardId === card.id);
 
     if (learningSessionCurrentCardIndex >= learningSession.length) {
       await ModelUser.updateOne(

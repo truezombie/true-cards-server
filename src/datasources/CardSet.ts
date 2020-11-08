@@ -28,7 +28,6 @@ class CardSetAPI extends BaseDataSourceAPI {
         userId: item.userId,
         name: item.name,
         cardsMax: item.cardsMax,
-        cardsAll: 0, // TODO: need to fix
       };
     });
 

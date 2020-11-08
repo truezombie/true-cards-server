@@ -23,7 +23,7 @@ class CardAPI extends BaseDataSourceAPI {
   async getCards(cardSetId: string, search: string, page: number, rowsPerPage: number) {
     await this.isExistUser();
 
-    const { name, cardsMax } = await ModelSchemaCardSet.findOne({
+    const { name, cardsMax, id } = await ModelSchemaCardSet.findOne({
       _id: cardSetId,
     });
 
@@ -39,6 +39,7 @@ class CardAPI extends BaseDataSourceAPI {
       .skip(page * rowsPerPage);
 
     return {
+      cardSetId: id,
       cardSetName: name,
       cardsMax,
       cards,

@@ -3,13 +3,13 @@ import { gql } from 'apollo-server-express';
 const typeDefs = gql`
   type Query {
     me: User
-    cardSets(search: String!, page: Int!, rowsPerPage: Int!): CardSets
+    cardSets(search: String!, page: Int, rowsPerPage: Int): CardSets
 
     getCurrentLearningCard: CurrentLearningCard
     resetLearningSession: String
     isExistLearningSession: Boolean
 
-    cards(cardSetId: String!, search: String!, page: Int!, rowsPerPage: Int!): CardsOutput
+    cards(cardSetId: String!, search: String, page: Int, rowsPerPage: Int): CardsOutput
   }
 
   type Mutation {
@@ -103,7 +103,6 @@ const typeDefs = gql`
     userId: ID!
     name: String!
     cardsMax: Int!
-    cardsAll: Int!
     cards: [Card]
   }
 
@@ -115,6 +114,7 @@ const typeDefs = gql`
   type CardsOutput {
     count: Int!
     cards: [Card]
+    cardSetId: String!
     cardSetName: String!
     cardsMax: Int!
   }
