@@ -1,6 +1,6 @@
 import { ApolloError } from 'apollo-server-express';
 
-import { InterfaceSchemaCardSet, ModelSchemaCardSet } from '../db/schemas';
+import { InterfaceSchemaCardSet, ModelSchemaCard, ModelSchemaCardSet } from '../db/schemas';
 import ERROR_CODES from '../utils/error-codes';
 import BaseDataSourceAPI from './BaseDataSource';
 
@@ -77,6 +77,7 @@ class CardSetAPI extends BaseDataSourceAPI {
   async deleteCardSet(cardSetId: string) {
     await this.isExistUser();
     await ModelSchemaCardSet.deleteOne({ _id: cardSetId });
+    await ModelSchemaCard.deleteMany({ cardSetId });
 
     return 'OK';
   }
