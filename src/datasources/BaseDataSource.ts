@@ -19,6 +19,7 @@ class BaseDataSourceAPI extends DataSource {
 
   transporter = nodemailer.createTransport({
     service: 'gmail',
+    host: 'smtp.gmail.com',
     auth: {
       user: config.emailAddress.replace('@gmail.com', ''),
       pass: config.emailPassword,
