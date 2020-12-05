@@ -4,7 +4,7 @@ export const getSignInEmail = (email, currentLinkUuid) => {
   return {
     from: config.emailAddress,
     to: email,
-    subject: 'Password reset',
+    subject: 'Registration - true-cards.com',
     text: `Hi. Your registration link is: http://true-cards.com/registration/${currentLinkUuid} If your have a question please sand me email: ${config.emailAddress}`,
     html: `
               <div>
@@ -19,7 +19,7 @@ export const getForgotPasswordEmail = (userFirstName, userLastName, userEmail, p
   return {
     from: config.emailAddress,
     to: userEmail,
-    subject: 'Password reset',
+    subject: 'Password reset - true-cards.com',
     text: `Hi ${userFirstName} ${userLastName}. Your confirmation key is: ${passwordResetConfirmationKey} If your have a question please sand me email: ${config.emailAddress}`,
     html: `
             <div>
