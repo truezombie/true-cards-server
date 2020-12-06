@@ -57,6 +57,15 @@ const resolversUser = {
 
       return response;
     },
+
+    updatePersonalData: async (_, { firstName, lastName }, { dataSources }) => {
+      const response = await dataSources.userAPI.updatePersonalData({
+        firstName,
+        lastName,
+      });
+
+      return response;
+    },
   },
 };
 

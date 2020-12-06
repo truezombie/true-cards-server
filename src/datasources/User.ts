@@ -123,7 +123,19 @@ class UserAPI extends BaseDataSourceAPI {
   async updateForgettingIndex({ forgettingIndex }) {
     const userId = await this.isExistUser();
 
+    // TODO: backed validation
+
     await ModelUser.updateOne({ _id: userId }, { forgettingIndex });
+
+    return 'OK';
+  }
+
+  async updatePersonalData({ firstName, lastName }) {
+    const userId = await this.isExistUser();
+
+    // TODO: backed validation
+
+    await ModelUser.updateOne({ _id: userId }, { firstName, lastName });
 
     return 'OK';
   }

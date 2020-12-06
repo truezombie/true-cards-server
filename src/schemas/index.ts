@@ -24,6 +24,7 @@ const typeDefs = gql`
     checkUserRegistrationLinkUuid(uuid: String!): String
 
     updateForgettingIndex(forgettingIndex: Int!): String
+    updatePersonalData(firstName: String!, lastName: String!): String
 
     createCardSet(name: String!): String
     updateCardSet(cardSetId: String!, name: String!): String
