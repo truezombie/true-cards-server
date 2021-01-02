@@ -13,8 +13,14 @@ const resolversCardsSet = {
       return response;
     },
 
-    updateCardSet: async (_, { cardSetId, name }, { dataSources }) => {
-      const response = await dataSources.cardSetAPI.updateCardSet(cardSetId, name);
+    updateCardSetName: async (_, { cardSetId, name }, { dataSources }) => {
+      const response = await dataSources.cardSetAPI.updateCardSetName(cardSetId, name);
+
+      return response;
+    },
+
+    updateCardSetShare: async (_, { cardSetId, isShared }, { dataSources }) => {
+      const response = await dataSources.cardSetAPI.updateCardSetShare(cardSetId, isShared);
 
       return response;
     },

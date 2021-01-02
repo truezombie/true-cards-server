@@ -27,7 +27,8 @@ const typeDefs = gql`
     updatePersonalData(firstName: String!, lastName: String!): String
 
     createCardSet(name: String!): String
-    updateCardSet(cardSetId: String!, name: String!): String
+    updateCardSetName(cardSetId: String!, name: String!): String
+    updateCardSetShare(cardSetId: String!, isShared: Boolean!): String
     deleteCardSet(cardSetId: String!): String
 
     createCard(input: CardCreateInput!): String
@@ -104,6 +105,7 @@ const typeDefs = gql`
     userId: ID!
     name: String!
     cardsMax: Int!
+    isShared: Boolean!
     cards: [Card]
   }
 

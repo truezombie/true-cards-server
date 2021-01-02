@@ -27,6 +27,7 @@ class CardSetAPI extends BaseDataSourceAPI {
         id: item._id,
         userId: item.userId,
         name: item.name,
+        isShared: item.isShared,
         cardsMax: item.cardsMax,
       };
     });
@@ -59,6 +60,7 @@ class CardSetAPI extends BaseDataSourceAPI {
     const cardSet = new NewCardSet({
       userId,
       name: data.name,
+      isShared: false,
       cardsMax: DEFAULT_MAX_CARDS_IN_CARD_SET,
     });
 
@@ -67,10 +69,22 @@ class CardSetAPI extends BaseDataSourceAPI {
     return 'OK';
   }
 
-  async updateCardSet(cardSetId: string, name: string) {
+  async updateCardSetName(cardSetId: string, name: string) {
     await this.isExistUser();
+
+    // TODO: validation if cardSet is not exist
+
     await ModelSchemaCardSet.findOneAndUpdate({ _id: cardSetId }, { $set: { name } });
 
+    return 'OK';
+  }
+
+  async updateCardSetShare(cardSetId: string, isShared: boolean) {
+    await this.isExistUser();
+
+    // TODO: validation if cardSet is not exist
+
+    await ModelSchemaCardSet.findOneAndUpdate({ _id: cardSetId }, { $set: { isShared } });
     return 'OK';
   }
 
