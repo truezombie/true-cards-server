@@ -1,6 +1,6 @@
 import { ApolloError } from 'apollo-server-express';
 
-import { InterfaceSchemaCardSet, ModelSchemaCard, ModelSchemaCardSet } from '../db/schemas';
+import { InterfaceSchemaCardSet, ModelSchemaCard, ModelSchemaCardSet, ModelSubscription } from '../db/schemas';
 import ERROR_CODES from '../utils/error-codes';
 import BaseDataSourceAPI from './BaseDataSource';
 
@@ -10,13 +10,20 @@ class CardSetAPI extends BaseDataSourceAPI {
   async getCardSets(search, page, rowsPerPage) {
     const userId = await this.isExistUser();
     // TODO: need to refactor
+
+    const subscriptions = await ModelSubscription.find({
+      userId,
+    });
+
+    const subscriptionsIds = subscriptions.map((subscription) => subscription.cardSetId);
+
     const count = await ModelSchemaCardSet.find({
       userId,
       name: { $regex: search },
     }).countDocuments({ userId });
 
     const allCardSets = await ModelSchemaCardSet.find({
-      userId,
+      $or: [{ _id: subscriptionsIds }, { userId }],
       name: { $regex: search },
     })
       .limit(rowsPerPage)
@@ -25,8 +32,8 @@ class CardSetAPI extends BaseDataSourceAPI {
     const cardSets = allCardSets.map((item) => {
       return {
         id: item._id,
-        userId: item.userId,
         name: item.name,
+        userId: item.userId,
         isShared: item.isShared,
         cardsMax: item.cardsMax,
       };

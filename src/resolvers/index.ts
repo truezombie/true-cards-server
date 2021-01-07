@@ -3,6 +3,7 @@ import resolversUser from './user';
 import resolversCardSet from './cardSet';
 import resolversLearning from './learning';
 import resolversPreRegisteredUser from './preRegisteredUser';
+import resolversSharedCardsSet from './sharedCardSet';
 
 const resolvers = {
   Query: {
@@ -10,6 +11,7 @@ const resolvers = {
     ...resolversUser.query,
     ...resolversCardSet.query,
     ...resolversLearning.query,
+    ...resolversSharedCardsSet.query,
     ...resolversPreRegisteredUser.query,
   },
 
@@ -18,6 +20,7 @@ const resolvers = {
     ...resolversUser.mutations,
     ...resolversCardSet.mutation,
     ...resolversLearning.mutations,
+    ...resolversSharedCardsSet.mutations,
     ...resolversPreRegisteredUser.mutations,
   },
 };

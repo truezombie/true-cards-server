@@ -5,6 +5,8 @@ const typeDefs = gql`
     me: User
     cardSets(search: String!, page: Int, rowsPerPage: Int): CardSets
 
+    sharedCardSets(search: String!, page: Int, rowsPerPage: Int): CardSets
+
     getCurrentLearningCard: CurrentLearningCard
     resetLearningSession: String
     isExistLearningSession: Boolean
@@ -37,10 +39,14 @@ const typeDefs = gql`
 
     startLearningSession(numberOfCards: Int!, cardSetId: String!, sessionType: String!): String
     setNextLearningCard(knowCurrentCard: Boolean!): String
+
+    setSubscription(cardSetId: String!): String
+    setUnSubscription(cardSetId: String!): String
   }
 
   type CardSets {
     cardSets: [CardSet]
+    subscriptions: [String]
     count: Int
   }
 

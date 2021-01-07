@@ -1,7 +1,7 @@
 import { ApolloError } from 'apollo-server-express';
 import moment from 'moment';
 
-import { InterfaceCard, ModelSchemaCard, ModelSchemaCardSet } from '../db/schemas';
+import { InterfaceCard, ModelSchemaCard, ModelSchemaCardSet, ModelSubscription } from '../db/schemas';
 import ERROR_CODES from '../utils/error-codes';
 import BaseDataSourceAPI from './BaseDataSource';
 
@@ -21,31 +21,43 @@ const cardTemplate = {
 
 class CardAPI extends BaseDataSourceAPI {
   async getCards(cardSetId: string, search: string, page: number, rowsPerPage: number) {
-    await this.isExistUser();
+    const userId = await this.isExistUser();
 
-    const { name, cardsMax, id } = await ModelSchemaCardSet.findOne({
-      _id: cardSetId,
-    });
+    try {
+      const currentCardSetIsShared = await ModelSubscription.findOne({ cardSetId, userId });
+      const currentCardSetIsMy = await ModelSchemaCardSet.findOne({ _id: cardSetId, userId });
 
-    const count = await ModelSchemaCard.find({
-      cardSetId,
-      $or: [{ front: { $regex: search } }, { back: { $regex: search } }],
-    }).countDocuments({ cardSetId });
+      if (!currentCardSetIsShared && !currentCardSetIsMy) {
+        throw new ApolloError(ERROR_CODES.ERROR_CARD_SET_NOT_FOUND);
+      }
 
-    const cards = await ModelSchemaCard.find({
-      cardSetId,
-      $or: [{ front: { $regex: search } }, { back: { $regex: search } }],
-    })
-      .limit(rowsPerPage)
-      .skip(page * rowsPerPage);
+      const { name, cardsMax, id } = await ModelSchemaCardSet.findOne({
+        _id: cardSetId,
+        $or: [{ isShared: true }, { userId }],
+      });
 
-    return {
-      cardSetId: id,
-      cardSetName: name,
-      cardsMax,
-      cards,
-      count,
-    };
+      const count = await ModelSchemaCard.find({
+        cardSetId,
+        $or: [{ front: { $regex: search } }, { back: { $regex: search } }],
+      }).countDocuments({ cardSetId });
+
+      const cards = await ModelSchemaCard.find({
+        cardSetId,
+        $or: [{ front: { $regex: search } }, { back: { $regex: search } }],
+      })
+        .limit(rowsPerPage)
+        .skip(page * rowsPerPage);
+
+      return {
+        cardSetId: id,
+        cardSetName: name,
+        cardsMax,
+        cards,
+        count,
+      };
+    } catch {
+      throw new ApolloError(ERROR_CODES.ERROR_CARD_SET_NOT_FOUND);
+    }
   }
 
   async createCard(cardInput: InterfaceCard) {
