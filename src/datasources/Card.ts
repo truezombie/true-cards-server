@@ -49,6 +49,7 @@ class CardAPI extends BaseDataSourceAPI {
         .skip(page * rowsPerPage);
 
       return {
+        isFollowingCardSet: !!currentCardSetIsShared,
         cardSetId: id,
         cardSetName: name,
         cardsMax,

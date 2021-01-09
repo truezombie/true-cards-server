@@ -126,6 +126,7 @@ const typeDefs = gql`
     cardSetId: String!
     cardSetName: String!
     cardsMax: Int!
+    isFollowingCardSet: Boolean!
   }
 `;
 
