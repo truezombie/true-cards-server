@@ -7,9 +7,6 @@ interface InterfaceCard extends mongoose.Document {
   back?: string;
   backDescription?: string;
   hasBackSide?: boolean;
-  timeAdded?: number;
-  timeLastSuccess?: number;
-  timesSuccess?: number;
 }
 
 const SchemaCard: mongoose.Schema = new mongoose.Schema<InterfaceCard>({
@@ -19,9 +16,6 @@ const SchemaCard: mongoose.Schema = new mongoose.Schema<InterfaceCard>({
   back: String,
   backDescription: String,
   hasBackSide: Boolean,
-  timeAdded: Number,
-  timeLastSuccess: Number,
-  timesSuccess: Number,
 });
 
 const ModelSchemaCard = mongoose.model<InterfaceCard>('Card', SchemaCard);

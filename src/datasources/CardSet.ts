@@ -1,4 +1,5 @@
 import { ApolloError } from 'apollo-server-express';
+import mongoose from 'mongoose';
 
 import { InterfaceSchemaCardSet, ModelSchemaCard, ModelSchemaCardSet, ModelSubscription } from '../db/schemas';
 import ERROR_CODES from '../utils/error-codes';
@@ -15,19 +16,54 @@ class CardSetAPI extends BaseDataSourceAPI {
       userId,
     });
 
-    const subscriptionsIds = subscriptions.map((subscription) => subscription.cardSetId);
+    const subscriptionsIds = subscriptions.map((subscription) => mongoose.Types.ObjectId(subscription.cardSetId));
 
-    const count = await ModelSchemaCardSet.find({
-      userId,
-      name: { $regex: search },
-    }).countDocuments({ userId });
+    const count = await ModelSchemaCardSet.aggregate([
+      {
+        $match: {
+          $and: [
+            { $or: [{ _id: { $in: subscriptionsIds } }, { userId: mongoose.Types.ObjectId(userId) }] },
+            { name: { $regex: search } },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      {
+        $count: 'count',
+      },
+    ]);
 
-    const allCardSets = await ModelSchemaCardSet.find({
-      $or: [{ _id: subscriptionsIds }, { userId }],
-      name: { $regex: search },
-    })
-      .limit(rowsPerPage)
-      .skip(page * rowsPerPage);
+    const allCardSets = await ModelSchemaCardSet.aggregate([
+      {
+        $match: {
+          $and: [
+            { $or: [{ _id: { $in: subscriptionsIds } }, { userId: mongoose.Types.ObjectId(userId) }] },
+            { name: { $regex: search } },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      {
+        $skip: page * rowsPerPage,
+      },
+      {
+        $limit: rowsPerPage,
+      },
+    ]);
 
     const cardSets = allCardSets.map((item) => {
       return {
@@ -36,12 +72,13 @@ class CardSetAPI extends BaseDataSourceAPI {
         userId: item.userId,
         isShared: item.isShared,
         cardsMax: item.cardsMax,
+        author: `${item.user[0].firstName} ${item.user[0].lastName}`,
       };
     });
 
     return {
       cardSets,
-      count,
+      count: count[0].count,
     };
   }
 

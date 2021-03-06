@@ -1,4 +1,5 @@
 import { ApolloError } from 'apollo-server-express';
+import mongoose from 'mongoose';
 
 import { ModelSchemaCardSet, ModelSubscription } from '../db/schemas';
 import ERROR_CODES from '../utils/error-codes';
@@ -20,13 +21,31 @@ class SharedCardSetAPI extends BaseDataSourceAPI {
       userId: { $ne: userId },
     }).countDocuments({ isShared: true });
 
-    const allCardSets = await ModelSchemaCardSet.find({
-      isShared: true,
-      name: { $regex: search },
-      userId: { $ne: userId },
-    })
-      .limit(rowsPerPage)
-      .skip(page * rowsPerPage);
+    const allCardSets = await ModelSchemaCardSet.aggregate([
+      {
+        $match: {
+          $and: [
+            { isShared: true },
+            { name: { $regex: search } },
+            { userId: { $ne: mongoose.Types.ObjectId(userId) } },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      {
+        $limit: rowsPerPage,
+      },
+      {
+        $skip: page * rowsPerPage,
+      },
+    ]);
 
     const cardSets = allCardSets.map((item) => {
       return {
@@ -36,6 +55,7 @@ class SharedCardSetAPI extends BaseDataSourceAPI {
         isShared: item.isShared,
         cardsMax: item.cardsMax,
         isSubscribed: subscriptionsIds,
+        author: `${item.user[0].firstName} ${item.user[0].lastName}`,
       };
     });
 

@@ -78,9 +78,9 @@ const typeDefs = gql`
     back: String
     backDescription: String
     hasBackSide: Boolean
-    timeAdded: Float
-    timeLastSuccess: Float
-    timesSuccess: Float
+    # timeAdded: Float
+    # timeLastSuccess: Float
+    # timesSuccess: Float
   }
 
   type CurrentLearningCard {
@@ -112,6 +112,7 @@ const typeDefs = gql`
     name: String!
     cardsMax: Int!
     isShared: Boolean!
+    author: String!
     cards: [Card]
   }
 
