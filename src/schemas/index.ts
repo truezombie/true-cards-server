@@ -2,7 +2,7 @@ import { gql } from 'apollo-server-express';
 
 const typeDefs = gql`
   type Query {
-    me: User
+    me: User @document(contentSet: "@lala")
     cardSets(search: String!, page: Int, rowsPerPage: Int): CardSets
 
     sharedCardSets(search: String!, page: Int, rowsPerPage: Int): CardSets
