@@ -2,7 +2,7 @@ import { gql } from 'apollo-server-express';
 
 const typeDefs = gql`
   type Query {
-    me: User @document(contentSet: "@lala")
+    me: User
     cardSets(search: String!, page: Int, rowsPerPage: Int): CardSets
 
     sharedCardSets(search: String!, page: Int, rowsPerPage: Int): CardSets
@@ -78,9 +78,6 @@ const typeDefs = gql`
     back: String
     backDescription: String
     hasBackSide: Boolean
-    # timeAdded: Float
-    # timeLastSuccess: Float
-    # timesSuccess: Float
   }
 
   type CurrentLearningCard {
@@ -93,6 +90,15 @@ const typeDefs = gql`
     from: Int
   }
 
+  type Progress {
+    id: ID!
+    cardSetId: String!
+    cardId: String!
+    userId: String!
+    timeLastSuccess: Float!
+    timesSuccess: Float!
+  }
+
   type Card {
     id: ID!
     cardSetId: String!
@@ -102,8 +108,7 @@ const typeDefs = gql`
     backDescription: String
     hasBackSide: Boolean
     timeAdded: Float
-    timeLastSuccess: Float
-    timesSuccess: Float
+    progress: [Progress]
   }
 
   type CardSet {

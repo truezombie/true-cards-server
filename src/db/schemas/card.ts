@@ -1,23 +1,25 @@
-import mongoose from 'mongoose';
+import { Document, Schema, model } from 'mongoose';
 
-interface InterfaceCard extends mongoose.Document {
+interface InterfaceCard extends Document {
   cardSetId: string;
   front: string;
   frontDescription: string;
   back?: string;
   backDescription?: string;
   hasBackSide?: boolean;
+  timeAdded: number;
 }
 
-const SchemaCard: mongoose.Schema = new mongoose.Schema<InterfaceCard>({
+const SchemaCard: Schema = new Schema<InterfaceCard>({
   cardSetId: String,
   front: { type: String, required: true },
   frontDescription: String,
   back: String,
   backDescription: String,
   hasBackSide: Boolean,
+  timeAdded: Number,
 });
 
-const ModelSchemaCard = mongoose.model<InterfaceCard>('Card', SchemaCard);
+const ModelSchemaCard = model<InterfaceCard>('Card', SchemaCard);
 
 export { ModelSchemaCard, SchemaCard, InterfaceCard };

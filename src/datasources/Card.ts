@@ -15,21 +15,13 @@ const cardTemplate = {
   backDescription: '',
   hasBackSide: false,
   timeAdded: moment().valueOf(),
-  timeLastSuccess: 0,
-  timesSuccess: 0,
 };
-
 class CardAPI extends BaseDataSourceAPI {
   async getCards(cardSetId: string, search: string, page: number, rowsPerPage: number) {
     const userId = await this.isExistUser();
 
     try {
       const currentCardSetIsShared = await ModelSubscription.findOne({ cardSetId, userId });
-      const currentCardSetIsMy = await ModelSchemaCardSet.findOne({ _id: cardSetId, userId });
-
-      if (!currentCardSetIsShared && !currentCardSetIsMy) {
-        throw new ApolloError(ERROR_CODES.ERROR_CARD_SET_NOT_FOUND);
-      }
 
       const { name, cardsMax, id } = await ModelSchemaCardSet.findOne({
         _id: cardSetId,
@@ -41,22 +33,59 @@ class CardAPI extends BaseDataSourceAPI {
         $or: [{ front: { $regex: search } }, { back: { $regex: search } }],
       }).countDocuments({ cardSetId });
 
-      const cards = await ModelSchemaCard.find({
-        cardSetId,
-        $or: [{ front: { $regex: search } }, { back: { $regex: search } }],
-      })
-        .limit(rowsPerPage)
-        .skip(page * rowsPerPage);
+      const paginationState = [
+        {
+          $limit: rowsPerPage,
+        },
+        {
+          $skip: page * rowsPerPage,
+        },
+      ];
+
+      const pagination = rowsPerPage !== 0 ? paginationState : [];
+
+      const cardsWithProgress = await ModelSchemaCard.aggregate([
+        {
+          $match: {
+            $or: [{ front: { $regex: search } }, { back: { $regex: search } }],
+            cardSetId,
+          },
+        },
+        {
+          $addFields: { id: '$_id' },
+        },
+        {
+          $lookup: {
+            from: 'progresses',
+            let: { id: '$_id' },
+            as: 'progress',
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ['$userId', userId] },
+                      { $eq: ['$cardSetId', cardSetId] },
+                      { $eq: [{ $toObjectId: '$cardId' }, '$$id'] },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        },
+        ...pagination,
+      ]);
 
       return {
         isFollowingCardSet: !!currentCardSetIsShared,
         cardSetId: id,
         cardSetName: name,
         cardsMax,
-        cards,
+        cards: cardsWithProgress,
         count,
       };
-    } catch {
+    } catch (e) {
       throw new ApolloError(ERROR_CODES.ERROR_CARD_SET_NOT_FOUND);
     }
   }

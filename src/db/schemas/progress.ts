@@ -1,23 +1,21 @@
-import mongoose from 'mongoose';
+import { Document, Schema, model } from 'mongoose';
 
-interface InterfaceProgress extends mongoose.Document {
+interface InterfaceProgress extends Document {
   cardSetId: string;
   cardId: string;
   userId: string;
-  timeAdded: number;
   timeLastSuccess: number;
   timesSuccess: number;
 }
 
-const SchemaProgress: mongoose.Schema = new mongoose.Schema<InterfaceProgress>({
+const SchemaProgress: Schema = new Schema<InterfaceProgress>({
   cardSetId: String,
   cardId: String,
   userId: String,
-  timeAdded: Number,
   timeLastSuccess: Number,
   timesSuccess: Number,
 });
 
-const ModelSchemaCard = mongoose.model<InterfaceProgress>('Progress', SchemaProgress);
+const ModelProgress = model<InterfaceProgress>('Progress', SchemaProgress);
 
-export { ModelSchemaCard, SchemaProgress, InterfaceProgress };
+export { ModelProgress, SchemaProgress, InterfaceProgress };

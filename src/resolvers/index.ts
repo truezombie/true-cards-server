@@ -2,7 +2,6 @@ import resolverCard from './card';
 import resolversUser from './user';
 import resolversCardSet from './cardSet';
 import resolversLearning from './learning';
-import resolversProgress from './progress';
 import resolversSharedCardsSet from './sharedCardSet';
 import resolversPreRegisteredUser from './preRegisteredUser';
 
@@ -12,7 +11,6 @@ const resolvers = {
     ...resolversUser.query,
     ...resolversCardSet.query,
     ...resolversLearning.query,
-    ...resolversProgress.query,
     ...resolversSharedCardsSet.query,
     ...resolversPreRegisteredUser.query,
   },
@@ -22,7 +20,6 @@ const resolvers = {
     ...resolversUser.mutations,
     ...resolversCardSet.mutation,
     ...resolversLearning.mutations,
-    ...resolversProgress.mutations,
     ...resolversSharedCardsSet.mutations,
     ...resolversPreRegisteredUser.mutations,
   },

@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { ApolloError } from 'apollo-server-express';
 
-import { ModelSchemaCard, ModelUser } from '../db/schemas';
+import { ModelSchemaCard, ModelUser, ModelProgress, InterfaceProgress, InterfaceCard } from '../db/schemas';
 import BaseDataSourceAPI from './BaseDataSource';
 import ERROR_CODES from '../utils/error-codes';
 
@@ -13,46 +13,77 @@ enum LEARNING_SESSION_TYPES {
   LEARNED = 'LEARNED',
 }
 
+type CardsWithProgresses = InterfaceCard & { progress: InterfaceProgress[] };
 class LearningAPI extends BaseDataSourceAPI {
   private SEED_OF_OBLIVION = 1;
 
-  isCardLearned = (card): boolean => {
-    return moment(new Date()).isBefore(
-      moment(card.timeLastSuccess).add(this.SEED_OF_OBLIVION * card.timeLastSuccess, 'd')
-    );
+  getCardProgress = (card: CardsWithProgresses): InterfaceProgress | undefined => {
+    return card.progress[0];
   };
 
-  isForgottenCard = (card) => {
-    return !this.isCardLearned(card);
+  isCardLearned = (card: CardsWithProgresses): boolean => {
+    const progress = this.getCardProgress(card);
+
+    if (progress) {
+      return moment(new Date()).isBefore(
+        moment(progress.timeLastSuccess).add(this.SEED_OF_OBLIVION * progress.timesSuccess, 'd')
+      );
+    }
+
+    return false;
   };
 
-  isNewCard = (card) => {
-    return card.timesSuccess === 0;
+  isForgottenCard = (card: CardsWithProgresses): boolean => {
+    return !this.isNewCard(card) && !this.isCardLearned(card);
   };
 
-  async getCards(cardSetId: string) {
-    const user = await this.isExistUser();
-    const cards = await ModelSchemaCard.find({
-      cardSetId,
-    });
-
-    return {
-      user,
-      cards,
-    };
-  }
+  isNewCard = (card: CardsWithProgresses): boolean => {
+    return this.getCardProgress(card) === undefined;
+  };
 
   async startLearningSession(numberOfCards: number, cardSetId: string, sessionType: LEARNING_SESSION_TYPES) {
     // TODO: check that I can create learning session maybe session is exist
     // TODO: check that cards folder can be empty
     const userId = await this.isExistUser();
+
+    const cards = await ModelSchemaCard.aggregate<CardsWithProgresses>([
+      {
+        $match: {
+          cardSetId,
+        },
+      },
+      {
+        $addFields: { id: '$_id' },
+      },
+      {
+        $lookup: {
+          from: 'progresses',
+          let: { id: '$_id' },
+          as: 'progress',
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$userId', userId] },
+                    { $eq: ['$cardSetId', cardSetId] },
+                    { $eq: [{ $toObjectId: '$cardId' }, '$$id'] },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      },
+    ]);
+
     const { learningSession: learningCardsArrayIds } = await ModelUser.findOne({
       _id: userId,
     });
+
     if (learningCardsArrayIds.length !== 0) {
       throw new ApolloError(ERROR_CODES.ERROR_LEARNING_SESSION_ALREADY_EXIST);
     }
-    const { cards } = await this.getCards(cardSetId);
 
     const learningSession = cards
       .filter((card) => {
@@ -95,7 +126,7 @@ class LearningAPI extends BaseDataSourceAPI {
       throw new ApolloError(ERROR_CODES.ERROR_LEARNING_SESSION_IS_NOT_EXIST);
     }
 
-    const { cards } = await this.getCards(learningSessionCardSetId);
+    const cards = await ModelSchemaCard.find({ cardSetId: learningSessionCardSetId });
 
     const currentCardId = learningSession[learningSessionCurrentCardIndex];
     const currentCard = cards.find((card) => currentCardId === card.id);
@@ -128,12 +159,36 @@ class LearningAPI extends BaseDataSourceAPI {
     };
   }
 
-  // eslint-disable-next-line
   async setNextLearningCard(knowCurrentCard: boolean) {
     const userId = await this.isExistUser();
-    const { learningSessionCurrentCardIndex } = await ModelUser.findOne({
+    const { learningSessionCurrentCardIndex, learningSessionCardSetId, learningSession } = await ModelUser.findOne({
       _id: userId,
     });
+
+    const currentCardId = learningSession[learningSessionCurrentCardIndex];
+    const currentCardFindingPattern = {
+      userId,
+      cardId: currentCardId,
+      cardSetId: learningSessionCardSetId,
+    };
+
+    const progressForCurrentCard = await ModelProgress.findOne(currentCardFindingPattern);
+
+    const progressPayload = {
+      cardSetId: learningSessionCardSetId,
+      cardId: currentCardId,
+      userId,
+      timeLastSuccess: knowCurrentCard ? moment().valueOf() : 0,
+      timesSuccess: knowCurrentCard ? (progressForCurrentCard?.timesSuccess || 0) + 1 : 0,
+    };
+
+    if (progressForCurrentCard) {
+      await ModelProgress.updateOne(currentCardFindingPattern, progressPayload);
+    } else {
+      const newProgressForCurrentCard = new ModelProgress(progressPayload);
+
+      await newProgressForCurrentCard.save();
+    }
 
     await ModelUser.updateOne(
       { _id: userId },
