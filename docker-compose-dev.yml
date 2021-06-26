@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  true-cards-backend-database:
+    image: mongo:latest
+    container_name: true-cards-backend-database
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: ${DB_NAME}
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mongodb:/data/db
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    networks:
+      - true-cards-network
+  true-cards-backend:
+    container_name: true-cards-backend
+    image: true-cards-backend:1.0.0
+    build:
+      context: ./
+      target: development
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    networks:
+      - true-cards-network
+    command: npm run start:dev
+    env_file:
+      - .env
+    restart: unless-stopped
+networks:
+  true-cards-network:
+volumes:
+  mongodb:

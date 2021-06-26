@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 import config from '../utils/config';
 
-const dbPath = `mongodb+srv://${config.dbUser}:${config.dbPassword}@${config.dbHost}/${config.dbName}?retryWrites=true&w=majority`;
+const dbPath = `mongodb://${config.dbUser}:${config.dbPassword}@${config.dbHost}:${config.dbPort}/${config.dbName}?authSource=admin`;
 
 const connectToMongoDb = async () => {
   try {
